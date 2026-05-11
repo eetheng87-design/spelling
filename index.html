@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>K-pop 魔猎听写小舞台</title>
+  <style>
+    :root {
+      --bg1: #170529;
+      --bg2: #31115f;
+      --pink: #ff4fd8;
+      --cyan: #35e8ff;
+      --yellow: #ffe45e;
+      --green: #6dff9c;
+      --white: #fff7ff;
+      --card: rgba(255,255,255,.13);
+      --card2: rgba(255,255,255,.2);
+      --danger: #ff6b8a;
+      --ok: #61ffb1;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--white);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(255,79,216,.35), transparent 26%),
+        radial-gradient(circle at 80% 5%, rgba(53,232,255,.24), transparent 24%),
+        linear-gradient(135deg, var(--bg1), var(--bg2) 58%, #0c1035);
+      overflow-x: hidden;
+    }
+
+    .stars::before, .stars::after {
+      content: "✦ ✧ ✦ ✧ ✦ ✧ ✦ ✧ ✦ ✧";
+      position: fixed;
+      left: 0;
+      width: 100%;
+      opacity: .25;
+      pointer-events: none;
+      font-size: 28px;
+      letter-spacing: 18px;
+      animation: floatStars 13s linear infinite;
+    }
+
+    .stars::before { top: 10%; }
+    .stars::after { bottom: 12%; animation-duration: 18s; }
+
+    @keyframes floatStars {
+      0% { transform: translateX(-20%); }
+      100% { transform: translateX(20%); }
+    }
+
+    .app {
+      width: min(980px, 100%);
+      margin: 0 auto;
+      padding: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      letter-spacing: .3px;
+    }
+
+    .logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--pink), var(--cyan));
+      display: grid;
+      place-items: center;
+      box-shadow: 0 0 22px rgba(255,79,216,.7);
+      font-size: 24px;
+    }
+
+    .pill {
+      border: 1px solid rgba(255,255,255,.25);
+      background: rgba(255,255,255,.1);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+
+    .page { display: none; animation: pop .25s ease; }
+    .page.active { display: block; }
+
+    @keyframes pop {
+      from { opacity: 0; transform: translateY(8px) scale(.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .hero {
+      text-align: center;
+      padding: 24px 12px 14px;
+    }
+
+    h1 {
+      font-size: clamp(34px, 6vw, 58px);
+      margin: 10px 0 8px;
+      line-height: 1.05;
+      text-shadow: 0 0 18px rgba(255,79,216,.9);
+    }
+
+    .subtitle {
+      font-size: 18px;
+      opacity: .9;
+      margin-bottom: 16px;
+    }
+
+    .team {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 18px 0;
+    }
+
+    .idol {
+      border: 1px solid rgba(255,255,255,.22);
+      background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.08));
+      border-radius: 26px;
+      padding: 12px 8px;
+      min-height: 140px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 18px 35px rgba(0,0,0,.2);
+    }
+
+    .avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 28px;
+      display: grid;
+      place-items: center;
+      font-size: 38px;
+      background: rgba(255,255,255,.18);
+      border: 2px solid rgba(255,255,255,.25);
+      box-shadow: 0 0 16px rgba(53,232,255,.4);
+      overflow: hidden;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .idol b { margin-top: 8px; }
+    .idol span { font-size: 13px; opacity: .82; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    .bigBtn, .smallBtn, .dangerBtn, .ghostBtn {
+      border: 0;
+      color: var(--white);
+      border-radius: 26px;
+      padding: 18px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 16px 35px rgba(0,0,0,.25);
+      transition: transform .12s ease, filter .12s ease;
+    }
+
+    .bigBtn {
+      min-height: 94px;
+      font-size: 22px;
+      background: linear-gradient(135deg, var(--pink), #773cff 60%, var(--cyan));
+    }
+
+    .bigBtn.secondary { background: linear-gradient(135deg, #3d53ff, #8b4dff, #ff4fd8); }
+    .bigBtn.green { background: linear-gradient(135deg, #12b886, #41d98b, #35e8ff); }
+    .bigBtn.yellow { background: linear-gradient(135deg, #ff9f1c, #ff4fd8); }
+
+    .bigBtn:active, .smallBtn:active, .dangerBtn:active, .ghostBtn:active { transform: scale(.97); }
+
+    .smallBtn {
+      background: linear-gradient(135deg, #6d5dfc, #ff4fd8);
+      padding: 12px 14px;
+      border-radius: 18px;
+      font-size: 16px;
+    }
+
+    .ghostBtn {
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.25);
+      padding: 12px 14px;
+      border-radius: 18px;
+    }
+
+    .dangerBtn {
+      background: linear-gradient(135deg, #ff3b6b, #ff8c42);
+      padding: 12px 14px;
+      border-radius: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 30px;
+      padding: 18px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.2);
+      backdrop-filter: blur(12px);
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .toolbar > * { flex: 1; min-width: 140px; }
+
+    input[type="date"], input[type="file"], select, textarea {
+      width: 100%;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.25);
+      color: var(--white);
+      border-radius: 18px;
+      padding: 14px;
+      outline: none;
+    }
+
+    select option { color: #222; }
+
+    .wordCard {
+      text-align: center;
+      padding: 30px 14px;
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .languageTag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 9px 14px;
+      background: rgba(255,255,255,.16);
+      border: 1px solid rgba(255,255,255,.22);
+      font-weight: 800;
+    }
+
+    .word {
+      font-size: clamp(42px, 10vw, 88px);
+      font-weight: 1000;
+      margin: 4px 0;
+      text-shadow: 0 0 18px rgba(53,232,255,.65);
+      word-break: break-word;
+    }
+
+    .hint {
+      opacity: .9;
+      font-size: 18px;
+      min-height: 28px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 14px;
+    }
+
+    .progress {
+      height: 14px;
+      background: rgba(255,255,255,.14);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 10px 0 18px;
+      border: 1px solid rgba(255,255,255,.2);
+    }
+
+    .bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--pink), var(--cyan), var(--yellow));
+      transition: width .2s ease;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
+      align-items: center;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 20px;
+      padding: 12px;
+    }
+
+    .scoreBox {
+      text-align: center;
+      padding: 28px 18px;
+    }
+
+    .score {
+      font-size: 58px;
+      font-weight: 1000;
+      color: var(--yellow);
+      text-shadow: 0 0 18px rgba(255,228,94,.7);
+    }
+
+    .confetti {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 9;
+    }
+
+    .confetti span {
+      position: absolute;
+      top: -20px;
+      animation: fall 1.8s linear forwards;
+      font-size: 24px;
+    }
+
+    @keyframes fall {
+      to { transform: translateY(110vh) rotate(540deg); opacity: 0; }
+    }
+
+    .empty {
+      text-align: center;
+      padding: 26px;
+      opacity: .92;
+    }
+
+    .note {
+      font-size: 14px;
+      opacity: .8;
+      line-height: 1.55;
+    }
+
+    .footerSpace { height: 32px; }
+
+    @media (max-width: 700px) {
+      .grid, .team { grid-template-columns: 1fr; }
+      .topbar { align-items: flex-start; }
+      .pill { display: none; }
+      .row { grid-template-columns: 1fr; }
+      .bigBtn { min-height: 82px; }
+    }
+  </style>
+</head>
+<body class="stars">
+  <div class="confetti" id="confetti"></div>
+
+  <main class="app">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">🎤</div>
+        <div>
+          <div>K-pop 魔猎听写小舞台</div>
+          <small>中文 · English · Bahasa Melayu</small>
+        </div>
+      </div>
+      <div class="pill" id="starPill">⭐ 0 stars</div>
+    </div>
+
+    <section id="homePage" class="page active">
+      <div class="hero">
+        <h1>今天也要<br>勇敢听写！</h1>
+        <div class="subtitle">选择日期，然后开始练习或正式听写。</div>
+      </div>
+
+      <div class="team">
+        <div class="idol">
+          <div class="avatar" id="avatar1">🎀</div>
+          <b>Rumi</b>
+          <span>中文小老师</span>
+        </div>
+        <div class="idol">
+          <div class="avatar" id="avatar2">⚔️</div>
+          <b>Mira</b>
+          <span>English Coach</span>
+        </div>
+        <div class="idol">
+          <div class="avatar" id="avatar3">💙</div>
+          <b>Zoey</b>
+          <span>BM Star</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="toolbar">
+          <input type="date" id="datePicker" />
+          <button class="smallBtn" onclick="loadByDate()">📅 选择日期</button>
+        </div>
+        <div class="grid">
+          <button class="bigBtn" onclick="startPractice()">🎧 练习模式</button>
+          <button class="bigBtn secondary" onclick="startDictation()">📝 正式听写</button>
+          <button class="bigBtn green" onclick="showPage('uploadPage')">📤 上传全年字表</button>
+          <button class="bigBtn yellow" onclick="showPage('scorePage'); renderScoreHistory();">🏆 我的星星</button>
+        </div>
+        <p class="note">提示：可以先用内置示范资料测试。正式使用时上传 CSV 字表。</p>
+      </div>
+    </section>
+
+    <section id="uploadPage" class="page">
+      <div class="card">
+        <h2>📤 上传字表</h2>
+        <p class="note">CSV 格式：Date,Language,Word,Hint。日期建议用 2026-05-12 这种格式。</p>
+        <input type="file" id="csvFile" accept=".csv,text/csv" />
+        <div class="controls">
+          <button class="smallBtn" onclick="importCSV()">导入 CSV</button>
+          <button class="ghostBtn" onclick="downloadSample()">下载示范 CSV</button>
+          <button class="dangerBtn" onclick="clearData()">清除资料</button>
+          <button class="ghostBtn" onclick="showPage('homePage')">回首页</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <h3>没有 CSV？也可以直接复制粘贴</h3>
+        <textarea id="pasteBox" rows="7" placeholder="Date,Language,Word,Hint&#10;2026-05-12,Chinese,苹果,水果&#10;2026-05-12,English,apple,fruit&#10;2026-05-12,Malay,epal,buah"></textarea>
+        <div class="controls">
+          <button class="smallBtn" onclick="importTextCSV()">导入上面的文字</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="practicePage" class="page">
+      <div class="card">
+        <div class="toolbar">
+          <button class="ghostBtn" onclick="showPage('homePage')">← 回首页</button>
+          <button class="smallBtn" onclick="speakCurrent(false)">🔊 听一次</button>
+          <button class="smallBtn" onclick="speakCurrent(true)">🐢 慢一点</button>
+        </div>
+        <div class="progress"><div id="practiceBar" class="bar"></div></div>
+        <div id="practiceContent" class="wordCard"></div>
+        <div class="controls">
+          <button class="ghostBtn" onclick="prevItem()">⬅️ 上一题</button>
+          <button class="smallBtn" onclick="nextItem()">下一题 ➡️</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="dictationPage" class="page">
+      <div class="card">
+        <div class="toolbar">
+          <button class="ghostBtn" onclick="showPage('homePage')">← 回首页</button>
+          <button class="smallBtn" onclick="speakCurrent(false)">🔊 再听一次</button>
+          <button class="smallBtn" onclick="speakCurrent(true)">🐢 慢一点</button>
+        </div>
+        <div class="progress"><div id="dictationBar" class="bar"></div></div>
+        <div id="dictationContent" class="wordCard"></div>
+        <div class="controls">
+          <button class="ghostBtn" onclick="prevItem()">⬅️ 上一题</button>
+          <button class="smallBtn" onclick="nextDictation()">我写好了 ➡️</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="checkPage" class="page">
+      <div class="card">
+        <h2>✅ 自己改听写</h2>
+        <p class="note">看答案后，自己按写对或写错。</p>
+        <div id="checkList" class="list"></div>
+        <div class="controls">
+          <button class="smallBtn" onclick="finishCheck()">完成改正 🎁</button>
+          <button class="ghostBtn" onclick="showPage('homePage')">回首页</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="resultPage" class="page">
+      <div class="card scoreBox">
+        <h2>🎉 今日任务完成！</h2>
+        <div class="score" id="finalScore">0/0</div>
+        <p id="finalMessage"></p>
+        <div class="controls">
+          <button class="smallBtn" onclick="startPractice()">再练习一次</button>
+          <button class="ghostBtn" onclick="showPage('homePage')">回首页</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="scorePage" class="page">
+      <div class="card">
+        <h2>🏆 我的星星记录</h2>
+        <div id="scoreHistory" class="list"></div>
+        <div class="controls">
+          <button class="ghostBtn" onclick="showPage('homePage')">回首页</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="footerSpace"></div>
+  </main>
+
+  <script>
+    const STORAGE_WORDS = 'kpop_spelling_words_v1';
+    const STORAGE_SCORES = 'kpop_spelling_scores_v1';
+    const STORAGE_STARS = 'kpop_spelling_stars_v1';
+
+    let allWords = [];
+    let currentWords = [];
+    let currentIndex = 0;
+    let mode = 'practice';
+    let checkResults = [];
+
+    const sampleWords = [
+      { Date: today(), Language: 'Chinese', Word: '苹果', Hint: '水果' },
+      { Date: today(), Language: 'Chinese', Word: '学校', Hint: '每天去的地方' },
+      { Date: today(), Language: 'English', Word: 'apple', Hint: 'fruit' },
+      { Date: today(), Language: 'English', Word: 'happy', Hint: 'feeling good' },
+      { Date: today(), Language: 'Malay', Word: 'epal', Hint: 'buah' },
+      { Date: today(), Language: 'Malay', Word: 'sekolah', Hint: 'tempat belajar' }
+    ];
+
+    function today() {
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function init() {
+      document.getElementById('datePicker').value = today();
+      allWords = loadWords();
+      if (!allWords.length) {
+        allWords = sampleWords;
+        saveWords();
+      }
+      loadByDate(false);
+      updateStars();
+    }
+
+    function loadWords() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_WORDS) || '[]'); }
+      catch { return []; }
+    }
+
+    function saveWords() {
+      localStorage.setItem(STORAGE_WORDS, JSON.stringify(allWords));
+    }
+
+    function getScores() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_SCORES) || '[]'); }
+      catch { return []; }
+    }
+
+    function saveScore(score) {
+      const scores = getScores();
+      scores.unshift(score);
+      localStorage.setItem(STORAGE_SCORES, JSON.stringify(scores.slice(0, 60)));
+    }
+
+    function getStars() {
+      return Number(localStorage.getItem(STORAGE_STARS) || 0);
+    }
+
+    function addStars(count) {
+      localStorage.setItem(STORAGE_STARS, String(getStars() + count));
+      updateStars();
+    }
+
+    function updateStars() {
+      document.getElementById('starPill').textContent = `⭐ ${getStars()} stars`;
+    }
+
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function loadByDate(goHome = true) {
+      const selectedDate = document.getElementById('datePicker').value;
+      currentWords = allWords.filter(x => normalizeDate(x.Date) === selectedDate);
+      currentIndex = 0;
+      if (goHome) {
+        alert(currentWords.length ? `找到 ${currentWords.length} 题！` : '这一天还没有听写字。');
+      }
+    }
+
+    function normalizeDate(value) {
+      if (!value) return '';
+      const v = String(value).trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
+      const parts = v.split(/[\/\-]/).map(s => s.trim());
+      if (parts.length === 3) {
+        if (parts[0].length === 4) return `${parts[0]}-${parts[1].padStart(2,'0')}-${parts[2].padStart(2,'0')}`;
+        return `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+      }
+      return v;
+    }
+
+    function ensureWords() {
+      loadByDate(false);
+      if (!currentWords.length) {
+        alert('这一天没有题目。请先选择有字表的日期，或上传 CSV。');
+        return false;
+      }
+      return true;
+    }
+
+    function startPractice() {
+      if (!ensureWords()) return;
+      mode = 'practice';
+      currentIndex = 0;
+      showPage('practicePage');
+      renderPractice();
+      setTimeout(() => speakCurrent(false), 300);
+    }
+
+    function startDictation() {
+      if (!ensureWords()) return;
+      mode = 'dictation';
+      currentIndex = 0;
+      checkResults = currentWords.map(() => null);
+      showPage('dictationPage');
+      renderDictation();
+      setTimeout(() => speakCurrent(false), 300);
+    }
+
+    function currentItem() {
+      return currentWords[currentIndex];
+    }
+
+    function languageIcon(lang) {
+      const l = String(lang || '').toLowerCase();
+      if (l.includes('chinese') || l.includes('中文') || l.includes('mandarin')) return '🧧 中文';
+      if (l.includes('malay') || l.includes('bm') || l.includes('bahasa')) return '🌿 BM';
+      return '🔤 English';
+    }
+
+    function renderPractice() {
+      const item = currentItem();
+      const pct = ((currentIndex + 1) / currentWords.length) * 100;
+      document.getElementById('practiceBar').style.width = pct + '%';
+      document.getElementById('practiceContent').innerHTML = `
+        <div class="languageTag">${languageIcon(item.Language)} · 第 ${currentIndex + 1}/${currentWords.length} 题</div>
+        <div class="word">${escapeHTML(item.Word)}</div>
+        <div class="hint">💡 ${escapeHTML(item.Hint || '没有提示')}</div>
+      `;
+    }
+
+    function renderDictation() {
+      const item = currentItem();
+      const pct = ((currentIndex + 1) / currentWords.length) * 100;
+      document.getElementById('dictationBar').style.width = pct + '%';
+      document.getElementById('dictationContent').innerHTML = `
+        <div class="languageTag">${languageIcon(item.Language)} · 第 ${currentIndex + 1}/${currentWords.length} 题</div>
+        <div class="word">🎧</div>
+        <div class="hint">听声音，然后写在纸上</div>
+      `;
+    }
+
+    function nextItem() {
+      if (!currentWords.length) return;
+      if (currentIndex < currentWords.length - 1) currentIndex++;
+      if (mode === 'practice') renderPractice();
+      else renderDictation();
+      speakCurrent(false);
+    }
+
+    function prevItem() {
+      if (!currentWords.length) return;
+      if (currentIndex > 0) currentIndex--;
+      if (mode === 'practice') renderPractice();
+      else renderDictation();
+      speakCurrent(false);
+    }
+
+    function nextDictation() {
+      if (currentIndex < currentWords.length - 1) {
+        currentIndex++;
+        renderDictation();
+        speakCurrent(false);
+      } else {
+        renderCheckList();
+        showPage('checkPage');
+      }
+    }
+
+    function speakCurrent(slow) {
+      const item = currentItem();
+      if (!item || !('speechSynthesis' in window)) {
+        alert('这个浏览器不支持语音功能。');
+        return;
+      }
+      speechSynthesis.cancel();
+      const text = item.Word;
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.rate = slow ? 0.62 : 0.9;
+      utter.pitch = 1.08;
+      const lang = String(item.Language || '').toLowerCase();
+      if (lang.includes('chinese') || lang.includes('中文') || lang.includes('mandarin')) utter.lang = 'zh-CN';
+      else if (lang.includes('malay') || lang.includes('bm') || lang.includes('bahasa')) utter.lang = 'ms-MY';
+      else utter.lang = 'en-US';
+      speechSynthesis.speak(utter);
+    }
+
+    function renderCheckList() {
+      const box = document.getElementById('checkList');
+      box.innerHTML = currentWords.map((item, idx) => `
+        <div class="row">
+          <div>
+            <b>${idx + 1}. ${escapeHTML(item.Word)}</b><br>
+            <small>${languageIcon(item.Language)} ${item.Hint ? ' · ' + escapeHTML(item.Hint) : ''}</small>
+          </div>
+          <button class="smallBtn" onclick="markResult(${idx}, true)">✅ 对</button>
+          <button class="dangerBtn" onclick="markResult(${idx}, false)">❌ 错</button>
+        </div>
+      `).join('');
+    }
+
+    function markResult(idx, value) {
+      checkResults[idx] = value;
+      renderCheckList();
+      const rows = document.querySelectorAll('#checkList .row');
+      rows.forEach((row, i) => {
+        if (checkResults[i] === true) row.style.borderColor = 'rgba(97,255,177,.8)';
+        if (checkResults[i] === false) row.style.borderColor = 'rgba(255,107,138,.8)';
+      });
+    }
+
+    function finishCheck() {
+      const unanswered = checkResults.filter(x => x === null).length;
+      if (unanswered) {
+        const ok = confirm(`还有 ${unanswered} 题没有按对/错。要继续完成吗？`);
+        if (!ok) return;
+      }
+      const total = currentWords.length;
+      const correct = checkResults.filter(Boolean).length;
+      const stars = Math.max(1, correct);
+      addStars(stars);
+
+      const date = document.getElementById('datePicker').value;
+      saveScore({ date, correct, total, stars, time: new Date().toLocaleString() });
+      document.getElementById('finalScore').textContent = `${correct}/${total}`;
+      document.getElementById('finalMessage').textContent = correct === total
+        ? `太棒了！全对！获得 ${stars} 颗星！`
+        : `完成了也很棒！获得 ${stars} 颗星，错的字再练一次。`;
+      confetti();
+      showPage('resultPage');
+    }
+
+    function renderScoreHistory() {
+      const scores = getScores();
+      const box = document.getElementById('scoreHistory');
+      if (!scores.length) {
+        box.innerHTML = '<div class="empty">还没有记录。完成一次正式听写就会出现。</div>';
+        return;
+      }
+      box.innerHTML = scores.map(s => `
+        <div class="row">
+          <div><b>${escapeHTML(s.date)}</b><br><small>${escapeHTML(s.time || '')}</small></div>
+          <div>✅ ${s.correct}/${s.total}</div>
+          <div>⭐ ${s.stars}</div>
+        </div>
+      `).join('');
+    }
+
+    function importCSV() {
+      const file = document.getElementById('csvFile').files[0];
+      if (!file) return alert('请先选择 CSV 文件。');
+      const reader = new FileReader();
+      reader.onload = e => {
+        const text = e.target.result;
+        const rows = parseCSV(text);
+        if (!rows.length) return alert('CSV 没有资料。');
+        allWords = rows;
+        saveWords();
+        loadByDate(false);
+        alert(`导入成功：${rows.length} 题`);
+        showPage('homePage');
+      };
+      reader.readAsText(file, 'UTF-8');
+    }
+
+    function importTextCSV() {
+      const text = document.getElementById('pasteBox').value.trim();
+      if (!text) return alert('请先粘贴 CSV 内容。');
+      const rows = parseCSV(text);
+      if (!rows.length) return alert('没有读到资料。');
+      allWords = rows;
+      saveWords();
+      loadByDate(false);
+      alert(`导入成功：${rows.length} 题`);
+      showPage('homePage');
+    }
+
+    function parseCSV(text) {
+      const lines = text.replace(/^\uFEFF/, '').split(/\r?\n/).filter(x => x.trim());
+      if (!lines.length) return [];
+      const header = splitCSVLine(lines[0]).map(x => x.trim());
+      const dateIdx = header.findIndex(h => h.toLowerCase() === 'date');
+      const langIdx = header.findIndex(h => h.toLowerCase() === 'language');
+      const wordIdx = header.findIndex(h => h.toLowerCase() === 'word');
+      const hintIdx = header.findIndex(h => h.toLowerCase() === 'hint');
+      if (dateIdx < 0 || langIdx < 0 || wordIdx < 0) {
+        alert('CSV 第一行必须有 Date,Language,Word，Hint 可有可无。');
+        return [];
+      }
+      return lines.slice(1).map(line => {
+        const cols = splitCSVLine(line);
+        return {
+          Date: normalizeDate(cols[dateIdx] || ''),
+          Language: (cols[langIdx] || '').trim(),
+          Word: (cols[wordIdx] || '').trim(),
+          Hint: hintIdx >= 0 ? (cols[hintIdx] || '').trim() : ''
+        };
+      }).filter(x => x.Date && x.Language && x.Word);
+    }
+
+    function splitCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') {
+          if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+          else inQuotes = !inQuotes;
+        } else if (ch === ',' && !inQuotes) {
+          result.push(current);
+          current = '';
+        } else {
+          current += ch;
+        }
+      }
+      result.push(current);
+      return result;
+    }
+
+    function downloadSample() {
+      const csv = `Date,Language,Word,Hint\n${today()},Chinese,苹果,水果\n${today()},Chinese,学校,每天去的地方\n${today()},English,apple,fruit\n${today()},English,happy,feeling good\n${today()},Malay,epal,buah\n${today()},Malay,sekolah,tempat belajar\n`;
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'spelling-sample.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function clearData() {
+      if (!confirm('确定要清除所有字表、成绩和星星吗？')) return;
+      localStorage.removeItem(STORAGE_WORDS);
+      localStorage.removeItem(STORAGE_SCORES);
+      localStorage.removeItem(STORAGE_STARS);
+      allWords = sampleWords;
+      saveWords();
+      updateStars();
+      alert('已清除，并恢复示范资料。');
+      showPage('homePage');
+    }
+
+    function escapeHTML(value) {
+      return String(value || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function confetti() {
+      const box = document.getElementById('confetti');
+      box.innerHTML = '';
+      const icons = ['⭐','🎤','💖','✨','🎁','🌈'];
+      for (let i = 0; i < 36; i++) {
+        const s = document.createElement('span');
+        s.textContent = icons[Math.floor(Math.random() * icons.length)];
+        s.style.left = Math.random() * 100 + 'vw';
+        s.style.animationDelay = Math.random() * .35 + 's';
+        s.style.fontSize = (18 + Math.random() * 20) + 'px';
+        box.appendChild(s);
+      }
+      setTimeout(() => box.innerHTML = '', 2200);
+    }
+
+    init();
+  </script>
+</body>
+</html>
