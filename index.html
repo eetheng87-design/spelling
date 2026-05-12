@@ -2,1059 +2,891 @@
 <html lang="zh-Hans">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>听写小舞台</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Rina 听写学院</title>
   <style>
     :root {
-      --bg1: #170529;
-      --bg2: #31115f;
-      --pink: #ff4fd8;
-      --cyan: #35e8ff;
-      --yellow: #ffe45e;
-      --green: #6dff9c;
-      --white: #fff7ff;
-      --card: rgba(255,255,255,.13);
-      --card2: rgba(255,255,255,.2);
-      --danger: #ff6b8a;
-      --ok: #61ffb1;
+      --bg1: #100223;
+      --bg2: #25104a;
+      --bg3: #030817;
+      --pink: #ff5fce;
+      --pink2: #ff9de6;
+      --purple: #8b5cf6;
+      --blue: #35b7ff;
+      --cyan: #45f6ff;
+      --gold: #ffd166;
+      --green: #69ff9a;
+      --red: #ff7c8a;
+      --glass: rgba(255,255,255,.10);
+      --glass2: rgba(255,255,255,.16);
+      --line: rgba(255,255,255,.20);
+      --text: #fff;
+      --muted: #ded2ff;
     }
 
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
 
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--white);
       min-height: 100vh;
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at 15% 15%, rgba(255,79,216,.35), transparent 26%),
-        radial-gradient(circle at 80% 5%, rgba(53,232,255,.24), transparent 24%),
-        linear-gradient(135deg, var(--bg1), var(--bg2) 58%, #0c1035);
+        radial-gradient(circle at 18% 16%, rgba(255, 95, 206, .45), transparent 28%),
+        radial-gradient(circle at 78% 25%, rgba(53, 183, 255, .34), transparent 28%),
+        radial-gradient(circle at 50% 110%, rgba(139, 92, 246, .42), transparent 38%),
+        linear-gradient(135deg, var(--bg1), var(--bg2) 48%, var(--bg3));
       overflow-x: hidden;
     }
 
-    .stars::before, .stars::after {
-      content: "✦ ✧ ✦ ✧ ✦ ✧ ✦ ✧ ✦ ✧";
+    body::before,
+    body::after {
+      content: "";
       position: fixed;
-      left: 0;
-      width: 100%;
-      opacity: .25;
+      inset: 0;
       pointer-events: none;
-      font-size: 28px;
-      letter-spacing: 18px;
-      animation: floatStars 13s linear infinite;
+      z-index: 0;
     }
 
-    .stars::before { top: 10%; }
-    .stars::after { bottom: 12%; animation-duration: 18s; }
-
-    @keyframes floatStars {
-      0% { transform: translateX(-20%); }
-      100% { transform: translateX(20%); }
+    body::before {
+      background-image:
+        linear-gradient(120deg, transparent 0 48%, rgba(255,255,255,.05) 49%, transparent 51% 100%),
+        radial-gradient(circle, rgba(255,255,255,.8) 1px, transparent 1px),
+        radial-gradient(circle, rgba(255,95,206,.9) 1px, transparent 1px);
+      background-size: 220px 220px, 95px 95px, 150px 150px;
+      animation: stars 28s linear infinite;
+      opacity: .5;
     }
+
+    body::after {
+      background: linear-gradient(115deg, transparent 0 35%, rgba(255,255,255,.08) 42%, transparent 48% 100%);
+      animation: spotlight 6s ease-in-out infinite;
+      opacity: .35;
+    }
+
+    @keyframes stars { from { transform: translateY(0); } to { transform: translateY(-180px); } }
+    @keyframes spotlight { 0%,100% { transform: translateX(-18%); } 50% { transform: translateX(18%); } }
 
     .app {
-      width: min(980px, 100%);
+      width: min(1380px, 96vw);
+      min-height: 100vh;
       margin: 0 auto;
-      padding: 18px;
+      padding: max(18px, env(safe-area-inset-top)) 0 max(24px, env(safe-area-inset-bottom));
       position: relative;
       z-index: 1;
     }
 
     .topbar {
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 16px;
+      margin-bottom: 18px;
+      position: sticky;
+      top: 8px;
+      z-index: 50;
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 900;
-      letter-spacing: .3px;
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 238px; }
+    .crown {
+      width: 56px; height: 56px; border-radius: 18px; display: grid; place-items: center;
+      background: linear-gradient(135deg, rgba(255,95,206,.95), rgba(139,92,246,.9));
+      box-shadow: 0 0 28px rgba(255,95,206,.45);
+      font-size: 30px;
+    }
+    .brand h1 { margin: 0; font-size: 30px; line-height: .95; letter-spacing: -1px; text-shadow: 0 0 22px rgba(255,95,206,.6); }
+    .brand small { color: var(--muted); font-weight: 800; letter-spacing: .5px; }
+
+    .nav {
+      flex: 1; max-width: 860px; display: flex; justify-content: center; gap: 8px; padding: 10px;
+      border: 1px solid var(--line); border-radius: 24px; background: rgba(255,255,255,.10);
+      backdrop-filter: blur(20px); box-shadow: 0 18px 50px rgba(0,0,0,.24); overflow-x: auto;
     }
 
-    .logo {
-      width: 46px;
-      height: 46px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, var(--pink), var(--cyan));
-      display: grid;
-      place-items: center;
-      box-shadow: 0 0 22px rgba(255,79,216,.7);
-      font-size: 24px;
+    button, .upload-label, select {
+      border: 0; border-radius: 999px; padding: 13px 18px; color: white; font-weight: 900; cursor: pointer;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); transition: .15s ease;
+      box-shadow: 0 10px 24px rgba(0,0,0,.16); font-size: 15px; white-space: nowrap;
+    }
+    select { outline: none; appearance: none; padding-right: 34px; }
+    select option { color: #161029; }
+    button:hover, .upload-label:hover, select:hover { transform: translateY(-2px); }
+    button:active { transform: scale(.97); }
+    button.active, button.active-filter {
+      color: white; background: linear-gradient(135deg, rgba(255,95,206,.72), rgba(139,92,246,.56));
+      box-shadow: 0 0 24px rgba(255,95,206,.35); outline: 3px solid rgba(255,255,255,.20);
+    }
+    .primary { background: linear-gradient(135deg, #ff5fce, #8b5cf6); box-shadow: 0 0 24px rgba(255,95,206,.28); }
+    .blue { background: linear-gradient(135deg, #35b7ff, #2563eb); box-shadow: 0 0 24px rgba(53,183,255,.25); }
+    .gold { background: linear-gradient(135deg, #ffd166, #ff9f1c); color: #281500; }
+    .danger { background: linear-gradient(135deg, #ff7c8a, #db2777); }
+
+    .coin { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.12); font-weight: 950; box-shadow: 0 10px 30px rgba(0,0,0,.16); }
+
+    .layout { display: grid; grid-template-columns: 420px 1fr; gap: 22px; }
+
+    .rina-panel, .panel, .welcome, .stage {
+      border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.10); backdrop-filter: blur(20px);
+      box-shadow: 0 26px 90px rgba(0,0,0,.28);
     }
 
-    .pill {
-      border: 1px solid rgba(255,255,255,.25);
-      background: rgba(255,255,255,.1);
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-size: 14px;
+    .rina-panel { position: relative; min-height: 760px; border-radius: 36px; overflow: hidden; background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06)), radial-gradient(circle at 50% 20%, rgba(255,95,206,.35), transparent 36%); }
+    .rina-glow { position: absolute; width: 460px; height: 460px; border-radius: 50%; background: radial-gradient(circle, rgba(255,95,206,.48), transparent 66%); top: 60px; left: -20px; filter: blur(4px); }
+    .rina-avatar { position: relative; height: 560px; display: flex; align-items: flex-end; justify-content: center; padding: 20px; z-index: 5; }
+    .rina-image {
+      width: min(100%, 360px);
+      max-height: 540px;
+      object-fit: contain;
+      filter: drop-shadow(0 25px 40px rgba(0,0,0,.35)) drop-shadow(0 0 18px rgba(255,95,206,.25));
+      animation: floatRina 4s ease-in-out infinite, rinaGlow 2.8s ease-in-out infinite;
+      user-select: none;
+      pointer-events: none;
+      transform-origin: center bottom;
+    }
+    .rina-image.pose-change { animation: posePop .45s ease both, floatRina 4s ease-in-out .45s infinite, rinaGlow 2.8s ease-in-out .45s infinite; }
+    @keyframes floatRina {
+      0%,100% { transform: translateY(0) rotate(-.4deg) scale(1); }
+      50% { transform: translateY(-10px) rotate(.5deg) scale(1.012); }
+    }
+    @keyframes rinaGlow {
+      0%,100% { filter: drop-shadow(0 25px 40px rgba(0,0,0,.35)) drop-shadow(0 0 14px rgba(255,95,206,.20)); }
+      50% { filter: drop-shadow(0 28px 44px rgba(0,0,0,.36)) drop-shadow(0 0 30px rgba(255,95,206,.48)); }
+    }
+    @keyframes posePop {
+      0% { opacity: .45; transform: translateY(18px) scale(.94); }
+      65% { opacity: 1; transform: translateY(-8px) scale(1.035); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    .page { display: none; animation: pop .25s ease; }
-    .page.active { display: block; }
+    .speech { position: absolute; left: 28px; top: 116px; width: 226px; padding: 20px; border-radius: 28px 28px 28px 8px; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.25); box-shadow: 0 0 28px rgba(255,95,206,.22); font-size: 22px; font-weight: 950; line-height: 1.25; z-index: 10; }
+    .profile-card { position: absolute; left: 26px; right: 26px; bottom: 26px; padding: 18px; border-radius: 24px; background: rgba(0,0,0,.30); border: 1px solid rgba(255,255,255,.19); z-index: 12; }
+    .profile-card h2 { margin: 0 0 10px; font-size: 23px; }
+    .profile-card p { margin: 7px 0; color: #f4eaff; line-height: 1.45; font-weight: 700; }
 
-    @keyframes pop {
-      from { opacity: 0; transform: translateY(8px) scale(.98); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
+    .pose-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .pose-row button { padding: 9px 12px; font-size: 13px; }
 
-    .hero {
-      text-align: center;
-      padding: 24px 12px 14px;
-    }
+    .main { display: grid; gap: 18px; }
+    .home-view { display: grid; gap: 18px; }
+    .welcome { position: relative; padding: 26px 30px; min-height: 156px; border-radius: 34px; overflow: hidden; background: radial-gradient(circle at 90% 30%, rgba(255,95,206,.32), transparent 30%), linear-gradient(135deg, rgba(255,255,255,.15), rgba(255,255,255,.08)); }
+    .welcome h2 { margin: 0 0 8px; font-size: clamp(30px, 5vw, 52px); color: #ff9de6; text-shadow: 0 0 26px rgba(255,95,206,.55); }
+    .welcome p { margin: 0; font-size: 19px; color: var(--muted); font-weight: 750; }
+    .cat-bubble { position: absolute; right: 28px; bottom: 20px; font-size: 48px; filter: drop-shadow(0 0 20px rgba(53,183,255,.6)); animation: float 3s ease-in-out infinite; }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
-    h1 {
-      font-size: clamp(34px, 6vw, 58px);
-      margin: 10px 0 8px;
-      line-height: 1.05;
-      text-shadow: 0 0 18px rgba(255,79,216,.9);
-    }
-
-    .subtitle {
+    .panel { padding: 24px; border-radius: 34px; }
+    .panel-title { margin: 0 0 18px; font-size: 22px; display: flex; align-items: center; gap: 10px; }
+    .date-picker-box { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; }
+    .date-select {
+      width: 100%;
+      border-radius: 22px;
+      padding: 16px 18px;
       font-size: 18px;
-      opacity: .9;
-      margin-bottom: 16px;
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.24);
+      color: white;
     }
-
-    .team {
+    .today-summary {
+      margin-top: 14px;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      margin: 18px 0;
     }
-
-    .idol {
-      border: 1px solid rgba(255,255,255,.22);
-      background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.08));
-      border-radius: 26px;
-      padding: 12px 8px;
-      min-height: 140px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 18px 35px rgba(0,0,0,.2);
-    }
-
-    .avatar {
-      width: 72px;
-      height: 72px;
-      border-radius: 28px;
-      display: grid;
-      place-items: center;
-      font-size: 38px;
-      background: rgba(255,255,255,.18);
-      border: 2px solid rgba(255,255,255,.25);
-      box-shadow: 0 0 16px rgba(53,232,255,.4);
-      overflow: hidden;
-    }
-
-    .avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .idol b { margin-top: 8px; }
-    .idol span { font-size: 13px; opacity: .82; }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
-      margin-top: 18px;
-    }
-
-    button, input, select, textarea {
-      font: inherit;
-    }
-
-    .bigBtn, .smallBtn, .dangerBtn, .ghostBtn {
-      border: 0;
-      color: var(--white);
-      border-radius: 26px;
-      padding: 18px;
-      font-weight: 900;
-      cursor: pointer;
-      box-shadow: 0 16px 35px rgba(0,0,0,.25);
-      transition: transform .12s ease, filter .12s ease;
-    }
-
-    .bigBtn {
-      min-height: 94px;
-      font-size: 22px;
-      background: linear-gradient(135deg, var(--pink), #773cff 60%, var(--cyan));
-    }
-
-    .bigBtn.secondary { background: linear-gradient(135deg, #3d53ff, #8b4dff, #ff4fd8); }
-    .bigBtn.green { background: linear-gradient(135deg, #12b886, #41d98b, #35e8ff); }
-    .bigBtn.yellow { background: linear-gradient(135deg, #ff9f1c, #ff4fd8); }
-
-    .bigBtn:active, .smallBtn:active, .dangerBtn:active, .ghostBtn:active { transform: scale(.97); }
-
-    .smallBtn {
-      background: linear-gradient(135deg, #6d5dfc, #ff4fd8);
-      padding: 12px 14px;
-      border-radius: 18px;
-      font-size: 16px;
-    }
-
-    .ghostBtn {
-      background: rgba(255,255,255,.14);
-      border: 1px solid rgba(255,255,255,.25);
-      padding: 12px 14px;
-      border-radius: 18px;
-    }
-
-    .dangerBtn {
-      background: linear-gradient(135deg, #ff3b6b, #ff8c42);
-      padding: 12px 14px;
-      border-radius: 18px;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid rgba(255,255,255,.2);
-      border-radius: 30px;
-      padding: 18px;
-      box-shadow: 0 20px 50px rgba(0,0,0,.2);
-      backdrop-filter: blur(12px);
-    }
-
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 14px;
-    }
-
-    .toolbar > * { flex: 1; min-width: 140px; }
-
-    input[type="date"], input[type="file"], select, textarea {
-      width: 100%;
-      background: rgba(255,255,255,.12);
-      border: 1px solid rgba(255,255,255,.25);
-      color: var(--white);
-      border-radius: 18px;
+    .summary-chip {
       padding: 14px;
-      outline: none;
-    }
-
-    select option { color: #222; }
-
-    .wordCard {
-      text-align: center;
-      padding: 30px 14px;
-      min-height: 300px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .languageTag {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      border-radius: 999px;
-      padding: 9px 14px;
-      background: rgba(255,255,255,.16);
-      border: 1px solid rgba(255,255,255,.22);
-      font-weight: 800;
-    }
-
-    .word {
-      font-size: clamp(42px, 10vw, 88px);
-      font-weight: 1000;
-      margin: 4px 0;
-      text-shadow: 0 0 18px rgba(53,232,255,.65);
-      word-break: break-word;
-    }
-
-    .hint {
-      opacity: .9;
-      font-size: 18px;
-      min-height: 28px;
-    }
-
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 14px;
-    }
-
-    .progress {
-      height: 14px;
-      background: rgba(255,255,255,.14);
-      border-radius: 999px;
-      overflow: hidden;
-      margin: 10px 0 18px;
-      border: 1px solid rgba(255,255,255,.2);
-    }
-
-    .bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, var(--pink), var(--cyan), var(--yellow));
-      transition: width .2s ease;
-    }
-
-    .list {
-      display: grid;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: 1fr auto auto;
-      gap: 8px;
-      align-items: center;
-      background: rgba(255,255,255,.1);
-      border: 1px solid rgba(255,255,255,.16);
       border-radius: 20px;
-      padding: 12px;
-    }
-
-    .scoreBox {
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.12);
       text-align: center;
-      padding: 28px 18px;
+    }
+    .summary-chip b { display:block; font-size:24px; margin-bottom:4px; }
+    .summary-chip span { color: var(--muted); font-size:13px; font-weight:800; }
+
+    .control-grid { display: grid; grid-template-columns: 1fr; gap: 18px; }
+    .upload-box { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    input[type="file"] { display: none; }
+    textarea { width: 100%; min-height: 110px; resize: vertical; border-radius: 22px; border: 1px solid rgba(255,255,255,.22); color: white; background: rgba(0,0,0,.22); padding: 14px; outline: none; line-height: 1.5; margin-top: 12px; }
+    .small-note { margin: 10px 0 0; color: #cfc2f5; font-size: 13px; line-height: 1.5; }
+
+    .study-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .mode-card { position: relative; min-height: 220px; padding: 25px; border-radius: 32px; border: 1px solid rgba(255,255,255,.22); background: linear-gradient(135deg, rgba(255,255,255,.14), rgba(255,255,255,.07)); overflow: hidden; }
+    .mode-card::after { content: ""; position: absolute; width: 160px; height: 160px; border-radius: 50%; right: -45px; bottom: -45px; background: radial-gradient(circle, rgba(255,95,206,.35), transparent 66%); }
+    .mode-card h3 { margin: 0 0 8px; font-size: 32px; }
+    .mode-card p { color: var(--muted); line-height: 1.55; font-size: 16px; margin-bottom: 22px; font-weight: 650; }
+
+    .stage { display: none; padding: 24px; border-radius: 34px; }
+    .stage.active { display: block; animation: screenIn .28s ease both; }
+    @keyframes screenIn { from { opacity: 0; transform: translateY(10px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .stage-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+    .stage-title { margin: 0; font-size: 26px; }
+
+    .word-card { position: relative; min-height: 390px; display: grid; place-items: center; text-align: center; padding: 34px; border-radius: 34px; border: 1px solid rgba(255,255,255,.18); background: radial-gradient(circle at 50% 12%, rgba(255,95,206,.30), transparent 34%), radial-gradient(circle at 90% 90%, rgba(53,183,255,.20), transparent 32%), rgba(0,0,0,.22); overflow: hidden; }
+    .word-card::before { content: ""; position: absolute; inset: -40%; background: conic-gradient(from 90deg, transparent, rgba(255,95,206,.16), transparent, rgba(53,183,255,.13), transparent); animation: spinGlow 7s linear infinite; }
+    .word-card > * { position: relative; z-index: 2; }
+    @keyframes spinGlow { to { transform: rotate(360deg); } }
+
+    .teacher-chip { position: absolute; top: 16px; left: 16px; display: flex; align-items: center; gap: 10px; padding: 9px 13px; border-radius: 999px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18); text-align: left; }
+    .teacher-face { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg, #ff7bdc, #8b5cf6); font-size: 20px; overflow: hidden; }
+    .teacher-face img { width: 100%; height: 100%; object-fit: cover; }
+    .counter { position: absolute; top: 18px; right: 18px; padding: 8px 14px; border-radius: 999px; background: rgba(0,0,0,.25); font-weight: 950; }
+    .word { font-size: clamp(52px, 9vw, 112px); margin: 0 0 12px; line-height: 1.06; text-shadow: 0 0 34px rgba(255,95,206,.42); }
+    .hidden-word { font-size: clamp(48px, 7vw, 86px); letter-spacing: 8px; margin: 0 0 14px; color: #eee7ff; }
+    .answer-word { font-size: clamp(44px, 7vw, 82px); color: var(--gold); margin: 12px 0 4px; text-shadow: 0 0 22px rgba(255,209,102,.35); }
+    .meta { color: var(--muted); font-weight: 780; line-height: 1.55; }
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 18px; }
+
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 18px; }
+    .stat { padding: 16px; border-radius: 22px; background: rgba(0,0,0,.20); border: 1px solid rgba(255,255,255,.12); text-align: center; }
+    .stat b { display: block; font-size: 28px; margin-bottom: 4px; color: white; }
+    .stat span { color: var(--muted); font-size: 13px; font-weight: 800; }
+    .result-list { display: grid; gap: 10px; margin-top: 16px; max-height: 360px; overflow: auto; padding-right: 4px; }
+    .result-item { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 13px; border-radius: 20px; background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.12); }
+    .pill { min-width: 58px; text-align: center; border-radius: 999px; padding: 8px 10px; font-weight: 950; background: rgba(255,255,255,.13); }
+    .pill.good { color: #062210; background: var(--green); }
+    .pill.bad { color: #2b050b; background: var(--red); }
+    .empty { text-align: center; padding: 42px; border: 1px dashed rgba(255,255,255,.24); border-radius: 28px; color: var(--muted); font-weight: 850; line-height: 1.6; }
+
+    .admin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .admin-card { padding: 18px; border-radius: 24px; background: rgba(0,0,0,.20); border: 1px solid rgba(255,255,255,.14); }
+    .admin-card b { display: block; font-size: 30px; margin-bottom: 4px; }
+    .setting-row { display: grid; grid-template-columns: 180px 1fr; gap: 12px; align-items: center; margin-top: 12px; }
+
+    .toast { position: fixed; left: 50%; bottom: max(26px, env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(20px); opacity: 0; pointer-events: none; z-index: 100; padding: 14px 18px; border-radius: 999px; background: rgba(20,8,39,.92); border: 1px solid rgba(255,255,255,.2); box-shadow: 0 18px 50px rgba(0,0,0,.38); font-weight: 900; transition: .25s ease; }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .celebration { position: fixed; inset: 0; z-index: 90; pointer-events: none; display: none; place-items: center; background: radial-gradient(circle, rgba(255,95,206,.20), transparent 55%); }
+    .celebration.show { display: grid; animation: fadeCelebration 1.8s ease both; }
+    .celebration .msg { font-size: clamp(42px, 8vw, 92px); font-weight: 950; text-align: center; text-shadow: 0 0 34px rgba(255,95,206,.8); }
+    @keyframes fadeCelebration { 0% { opacity: 0; transform: scale(.9); } 20%,80% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.08); } }
+
+    @media (max-width: 1080px) {
+      .layout { grid-template-columns: 1fr; }
+      .rina-panel { min-height: 610px; }
+      .rina-avatar { height: 430px; }
+      .rina-image { max-height: 410px; }
+      .speech { top: 74px; }
+      .today-summary { grid-template-columns: repeat(3, 1fr); }
+      .admin-grid { grid-template-columns: 1fr 1fr; }
     }
 
-    .score {
-      font-size: 58px;
-      font-weight: 1000;
-      color: var(--yellow);
-      text-shadow: 0 0 18px rgba(255,228,94,.7);
-    }
-
-    .confetti {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      overflow: hidden;
-      z-index: 9;
-    }
-
-    .confetti span {
-      position: absolute;
-      top: -20px;
-      animation: fall 1.8s linear forwards;
-      font-size: 24px;
-    }
-
-    @keyframes fall {
-      to { transform: translateY(110vh) rotate(540deg); opacity: 0; }
-    }
-
-    .empty {
-      text-align: center;
-      padding: 26px;
-      opacity: .92;
-    }
-
-    .note {
-      font-size: 14px;
-      opacity: .8;
-      line-height: 1.55;
-    }
-
-    .footerSpace { height: 32px; }
-
-    @media (max-width: 700px) {
-      .grid, .team { grid-template-columns: 1fr; }
-      .topbar { align-items: flex-start; }
-      .pill { display: none; }
-      .row { grid-template-columns: 1fr; }
-      .bigBtn { min-height: 82px; }
+    @media (max-width: 720px) {
+      body { overflow-x: hidden; }
+      .app { width: 100%; padding: env(safe-area-inset-top) 10px env(safe-area-inset-bottom); }
+      .topbar { position: sticky; top: 0; align-items: stretch; flex-direction: column; padding-top: 8px; }
+      .brand { min-width: auto; justify-content: space-between; }
+      .nav { justify-content: flex-start; max-width: none; border-radius: 22px; }
+      .coin { align-self: flex-end; position: absolute; top: 18px; right: 8px; }
+      .layout { gap: 12px; }
+      .rina-panel { min-height: 480px; border-radius: 28px; }
+      .rina-avatar { height: 315px; }
+      .rina-image { max-height: 310px; }
+      .speech { left: 16px; top: 58px; width: 190px; font-size: 18px; padding: 15px; }
+      .profile-card { left: 14px; right: 14px; bottom: 14px; }
+      .control-grid, .study-cards, .stats, .admin-grid, .setting-row { grid-template-columns: 1fr; }
+      .date-picker-box { grid-template-columns: 1fr; }
+      .today-summary { grid-template-columns: 1fr; }
+      .stage { min-height: calc(100vh - 160px); border-radius: 28px; padding: 16px; }
+      .word-card { min-height: calc(100vh - 330px); padding: 72px 16px 24px; }
+      .stage-head { flex-direction: column; align-items: flex-start; }
+      .result-item { grid-template-columns: 1fr; }
+      .cat-bubble { display: none; }
+      button, .upload-label, select { padding: 12px 14px; font-size: 14px; }
     }
   </style>
 </head>
-<body class="stars">
-  <div class="confetti" id="confetti"></div>
+<body>
+  <div id="celebration" class="celebration"><div class="msg">PERFECT! ✨<br>Rina 为你骄傲！</div></div>
+  <div id="toast" class="toast">Saved</div>
 
   <main class="app">
     <div class="topbar">
       <div class="brand">
-        <div class="logo">🎤</div>
+        <div class="crown">👑</div>
         <div>
-          <div>K-pop 魔猎听写小舞台</div>
-          <small>中文 · English · Bahasa Melayu</small>
+          <h1>RINA<br>ACADEMY</h1>
+          <small>Listen · Write · Shine</small>
         </div>
       </div>
-      <div class="pill" id="starPill">⭐ 0 stars</div>
+
+      <nav class="nav">
+        <button class="active" onclick="goHome()">🏠 首页</button>
+        <button onclick="startMode('practice')">📖 练习</button>
+        <button onclick="startMode('dictation')">✏️ 正式听写</button>
+        <button onclick="showResults()">🏆 成绩</button>
+        <button onclick="showWrongBook()">⭐ 错题本</button>
+        <button onclick="showParentDashboard()">👨‍👩‍👧 家长</button>
+      </nav>
+
+      <div class="coin">💎 <span id="coinCount">1280</span></div>
     </div>
 
-    <section id="homePage" class="page active">
-      <div class="hero">
-        <h1>今天也要<br>勇敢听写！</h1>
-        <div class="subtitle">选择日期，然后开始练习或正式听写。</div>
-      </div>
+    <section class="layout">
+      <aside class="rina-panel">
+        <div class="rina-glow"></div>
+        <div id="speech" class="speech">Hi, I'm<br>Teacher Rina!<br><span style="font-size:17px;color:#f3d7ff;">Let's learn, listen and shine together! ✨</span></div>
+        <div class="rina-avatar" aria-label="Teacher Rina character">
+          <img id="rinaImage" class="rina-image" src="rina-teacher.jpg" alt="Teacher Rina" onerror="this.style.display='none'; document.getElementById('rinaFallback').style.display='grid';" />
+          <div id="rinaFallback" style="display:none;width:300px;height:420px;border-radius:44px;background:linear-gradient(135deg,#ff7bdc,#8b5cf6);place-items:center;font-size:88px;box-shadow:0 0 45px rgba(255,95,206,.45);">🎀</div>
+        </div>
+        <div class="profile-card">
+          <h2>Teacher Rina</h2>
+          <p>⭐ 你的专属听写老师</p>
+          <p>⭐ 自动保存学习记录与错题</p>
+          <p>⭐ 每一次努力都会让你更闪耀！💖</p>
+          <div class="pose-row">
+            <button onclick="changePose('rina-teacher.jpg','normal')">普通</button>
+            <button onclick="changePose('rina-happy.jpg','happy')">开心</button>
+            <button onclick="changePose('rina-coach.jpg','coach')">鼓励</button>
+          </div>
+          <p style="font-size:12px;color:#cdbdff;margin-top:12px;line-height:1.5;">可放 3 张图：rina-teacher.jpg、rina-happy.jpg、rina-coach.jpg</p>
+        </div>
+      </aside>
 
-      <div class="card">
-        <div class="toolbar">
-          <input type="date" id="datePicker" />
-          <button class="smallBtn" onclick="loadByDate()">📅 选择日期</button>
-        </div>
-        <div class="grid">
-          <button class="bigBtn" onclick="startPractice()">🎧 练习模式</button>
-          <button class="bigBtn secondary" onclick="startDictation()">📝 正式听写</button>
-          <button class="bigBtn green" onclick="showPage('uploadPage')">📤 上传全年字表</button>
-          <button class="bigBtn yellow" onclick="showPage('scorePage'); renderScoreHistory();">🏆 我的星星</button>
-        </div>
-        <p class="note">提示：可以先用内置示范资料测试。正式使用时上传 CSV 字表。</p>
-      </div>
+      <section class="main">
+        <section id="home" class="home-view">
+          <div class="welcome">
+            <h2>嗨！我是 Rina 老师 ♡</h2>
+            <p id="welcomeText">选择日期，开始今天的听写学习之旅吧！</p>
+            <div class="cat-bubble">🐱</div>
+          </div>
+
+          <div class="panel">
+            <h3 class="panel-title">📅 选择日期</h3>
+            <div class="date-picker-box">
+              <select id="dateSelect" class="date-select" onchange="selectDate(this.value)"></select>
+              <button class="primary" onclick="startMode('practice')">开始今天练习</button>
+            </div>
+            <div id="todaySummary" class="today-summary"></div>
+            <p class="small-note">日期会根据 CSV 自动生成。选择日期后，系统会自动包含当天所有中文、英文和马来文。</p>
+          </div>
+
+          <div class="control-grid">
+            <div class="panel">
+              <h3 class="panel-title">📁 CSV 字表</h3>
+              <div class="upload-box">
+                <label class="upload-label primary" for="fileInput">上传 CSV</label>
+                <input type="file" id="fileInput" accept=".csv,text/csv" />
+                <button onclick="loadYesterdayCSV()">载入内建 CSV</button>
+                <button onclick="exportCSV()">导出 CSV</button>
+              </div>
+              <textarea id="manualInput" placeholder="日期,语言,字,提示"></textarea>
+              <div class="upload-box">
+                <button class="blue" onclick="loadManualCSV()">载入贴上的 CSV</button>
+                <button onclick="shuffleCurrent()">随机顺序</button>
+              </div>
+              <p class="small-note">CSV 格式：日期,语言,字,提示。例如：2026-05-15,zh,学校,school</p>
+            </div>
+          </div>
+
+          <div class="study-cards">
+            <div class="mode-card">
+              <h3>📖 练习模式</h3>
+              <p>看字、听发音、熟悉提示。适合正式听写前热身。</p>
+              <button class="primary" onclick="startMode('practice')">▶ 开始练习</button>
+            </div>
+            <div class="mode-card">
+              <h3>🎧 正式听写</h3>
+              <p>只听语音，写在纸上。批改后自动保存成绩和错题。</p>
+              <button class="blue" onclick="startMode('dictation')">▶ 开始听写</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="stage" class="stage">
+          <div class="stage-head">
+            <h2 id="stageTitle" class="stage-title">练习模式</h2>
+            <div class="btn-row" style="margin:0;">
+              <button onclick="goHome()">返回首页</button>
+              <button onclick="shuffleCurrent()">随机顺序</button>
+            </div>
+          </div>
+          <div id="stageContent"></div>
+        </section>
+      </section>
     </section>
-
-    <section id="uploadPage" class="page">
-      <div class="card">
-        <h2>📤 上传字表</h2>
-        <p class="note">CSV 格式：Date,Language,Word,Hint。日期建议用 2026-05-12 这种格式。</p>
-        <input type="file" id="csvFile" accept=".csv,text/csv" />
-        <div class="controls">
-          <button class="smallBtn" onclick="importCSV()">导入 CSV</button>
-          <button class="ghostBtn" onclick="downloadSample()">下载示范 CSV</button>
-          <button class="dangerBtn" onclick="clearData()">清除资料</button>
-          <button class="ghostBtn" onclick="showPage('homePage')">回首页</button>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:14px;">
-        <h3>没有 CSV？也可以直接复制粘贴</h3>
-        <textarea id="pasteBox" rows="7" placeholder="Date,Language,Word,Hint&#10;2026-05-12,Chinese,苹果,水果&#10;2026-05-12,English,apple,fruit&#10;2026-05-12,Malay,epal,buah"></textarea>
-        <div class="controls">
-          <button class="smallBtn" onclick="importTextCSV()">导入上面的文字</button>
-        </div>
-      </div>
-    </section>
-
-    <section id="practicePage" class="page">
-      <div class="card">
-        <div class="toolbar">
-          <button class="ghostBtn" onclick="showPage('homePage')">← 回首页</button>
-          <button class="smallBtn" onclick="speakCurrent(false)">🔊 听一次</button>
-          <button class="smallBtn" onclick="speakCurrent(true)">🐢 慢一点</button>
-        </div>
-        <div class="progress"><div id="practiceBar" class="bar"></div></div>
-        <div id="practiceContent" class="wordCard"></div>
-        <div class="controls">
-          <button class="ghostBtn" onclick="prevItem()">⬅️ 上一题</button>
-          <button class="smallBtn" onclick="nextItem()">下一题 ➡️</button>
-        </div>
-      </div>
-    </section>
-
-    <section id="dictationPage" class="page">
-      <div class="card">
-        <div class="toolbar">
-          <button class="ghostBtn" onclick="showPage('homePage')">← 回首页</button>
-          <button class="smallBtn" onclick="speakCurrent(false)">🔊 再听一次</button>
-          <button class="smallBtn" onclick="speakCurrent(true)">🐢 慢一点</button>
-        </div>
-        <div class="progress"><div id="dictationBar" class="bar"></div></div>
-        <div id="dictationContent" class="wordCard"></div>
-        <div class="controls">
-          <button class="ghostBtn" onclick="prevItem()">⬅️ 上一题</button>
-          <button class="smallBtn" onclick="nextDictation()">我写好了 ➡️</button>
-        </div>
-      </div>
-    </section>
-
-    <section id="checkPage" class="page">
-      <div class="card">
-        <h2>✅ 自己改听写</h2>
-        <p class="note">看答案后，自己按写对或写错。</p>
-        <div id="checkList" class="list"></div>
-        <div class="controls">
-          <button class="smallBtn" onclick="finishCheck()">完成改正 🎁</button>
-          <button class="ghostBtn" onclick="showPage('homePage')">回首页</button>
-        </div>
-      </div>
-    </section>
-
-    <section id="resultPage" class="page">
-      <div class="card scoreBox">
-        <h2>🎉 今日任务完成！</h2>
-        <div class="score" id="finalScore">0/0</div>
-        <p id="finalMessage"></p>
-        <div class="controls">
-          <button class="smallBtn" onclick="startPractice()">再练习一次</button>
-          <button class="ghostBtn" onclick="showPage('homePage')">回首页</button>
-        </div>
-      </div>
-    </section>
-
-    <section id="scorePage" class="page">
-      <div class="card">
-        <h2>🏆 我的星星记录</h2>
-        <div id="scoreHistory" class="list"></div>
-        <div class="controls">
-          <button class="ghostBtn" onclick="showPage('homePage')">回首页</button>
-        </div>
-      </div>
-    </section>
-
-    <div class="footerSpace"></div>
   </main>
 
   <script>
-    const STORAGE_WORDS = 'kpop_spelling_words_v1';
-    const STORAGE_SCORES = 'kpop_spelling_scores_v1';
-    const STORAGE_STARS = 'kpop_spelling_stars_v1';
-
-    let allWords = [];
-    let currentWords = [];
-    let currentIndex = 0;
+    const STORE_KEY = 'rina_dictation_app_v3';
+    let allRows = [];
+    let selectedDate = '';
+    let langFilter = 'all'; // 保留变量给旧学习记录使用，前台已不需要选择语言
+    let currentRows = [];
+    let index = 0;
     let mode = 'practice';
-    let checkResults = [];
+    let showAnswer = false;
+    let results = [];
+    let sessionStartedAt = null;
 
-    const sampleWords = [
-      // Data converted from: Spelling, Ejaan 听写list. Rainbow 1st 2026
-      { Date: '2026-03-09', Language: 'English', Word: 'sleep', Hint: '' },
-      { Date: '2026-03-09', Language: 'English', Word: 'feet', Hint: '' },
-      { Date: '2026-03-09', Language: 'English', Word: 'sweet', Hint: '' },
-      { Date: '2026-03-09', Language: 'English', Word: 'eat', Hint: '' },
-      { Date: '2026-03-09', Language: 'English', Word: 'bean', Hint: '' },
-      { Date: '2026-03-09', Language: 'English', Word: 'clean', Hint: '' },
+    const defaultCSV = `date,lang,word,hint
+2026-03-09,en,sleep,
+2026-03-09,en,feet,
+2026-03-09,en,sweet,
+2026-03-09,en,eat,
+2026-03-09,en,bean,
+2026-03-09,en,clean,
+2026-03-12,zh,黑裤,衣服
+2026-03-12,zh,红裙,衣服
+2026-03-12,zh,蓝鞋,鞋子
+2026-03-12,zh,绿袜,袜子
+2026-03-12,zh,白衣,衣服
+2026-03-12,zh,黄帽,帽子
+2026-03-16,ms,topi,帽子
+2026-03-16,ms,gaun,裙子
+2026-03-16,ms,blaus,上衣
+2026-03-16,ms,seluar,裤子
+2026-03-16,ms,kasut,鞋子
+2026-03-16,ms,Kemeja,衬衫
+2026-03-30,en,red,colour
+2026-03-30,en,blue,colour
+2026-03-30,en,yellow,colour
+2026-03-30,en,green,colour
+2026-03-30,en,white,colour
+2026-03-30,en,black,colour
+2026-04-06,ms,ketat,紧
+2026-04-06,ms,longgar,松
+2026-04-06,ms,baharu,新的
+2026-04-06,ms,lama,旧的
+2026-04-06,ms,pakai,穿/用
+2026-04-06,ms,ini,这个
+2026-04-09,zh,山竹,水果
+2026-04-09,zh,西瓜,水果
+2026-04-09,zh,洋白菜,蔬菜
+2026-04-09,zh,芒果,水果
+2026-04-09,zh,番茄,蔬果
+2026-04-09,zh,香蕉,水果
+2026-04-13,en,pail,
+2026-04-13,en,mail,
+2026-04-13,en,train,
+2026-04-13,en,clay,
+2026-04-13,en,play,
+2026-04-13,en,tray,
+2026-04-16,zh,泥土,
+2026-04-16,zh,树木,
+2026-04-16,zh,蝴蝶,
+2026-04-16,zh,玫瑰,
+2026-04-16,zh,青草,
+2026-04-16,zh,埋进,
+2026-04-20,ms,anggur,葡萄
+2026-04-20,ms,durian,榴莲
+2026-04-20,ms,epal,苹果
+2026-04-20,ms,nanas,黄梨
+2026-04-20,ms,oren,橙
+2026-04-20,ms,betik,木瓜
+2026-04-27,en,meat,
+2026-04-27,en,fish,
+2026-04-27,en,fruits,
+2026-04-27,en,market,
+2026-04-27,en,vegetables,
+2026-04-27,en,eggs,
+2026-04-30,zh,海边,
+2026-04-30,zh,海浪,
+2026-04-30,zh,晴天,
+2026-04-30,zh,阴天,
+2026-04-30,zh,贝壳,
+2026-04-30,zh,泳衣,
+2026-05-04,ms,ikan,鱼
+2026-05-04,ms,ayam,鸡
+2026-05-04,ms,daging,肉
+2026-05-04,ms,ketam,螃蟹
+2026-05-04,ms,udang,虾
+2026-05-04,ms,sotong,鱿鱼
+2026-05-11,en,zoo,
+2026-05-11,en,room,
+2026-05-11,en,pool,
+2026-05-11,en,hook,
+2026-05-11,en,book,
+2026-05-11,en,wood,
+2026-05-14,zh,狮子,
+2026-05-14,zh,海马,
+2026-05-14,zh,大象,
+2026-05-14,zh,老虎,
+2026-05-14,zh,蛇,
+2026-05-14,zh,猴子,
+2026-05-18,ms,betik,木瓜
+2026-05-18,ms,pisang,香蕉
+2026-05-18,ms,pokok,树
+2026-05-18,ms,tomato,番茄
+2026-05-18,ms,ros,玫瑰
+2026-05-18,ms,kaktus,仙人掌
+2026-06-08,en,horse,
+2026-06-08,en,goat,
+2026-06-08,en,sheep,
+2026-06-08,en,duck,
+2026-06-08,en,hen,
+2026-06-08,en,cow,
+2026-06-11,zh,店员,
+2026-06-11,zh,电梯,
+2026-06-11,zh,自动扶梯,
+2026-06-11,zh,钱,
+2026-06-11,zh,手推车,
+2026-06-11,zh,购物中心,
+2026-06-15,en,hose,
+2026-06-15,en,soil,
+2026-06-15,en,spade,
+2026-06-15,en,fork,
+2026-06-15,en,flowerpot,
+2026-06-15,en,garden,
+2026-06-22,en,croak,
+2026-06-22,en,coat,
+2026-06-22,en,moat,
+2026-06-22,en,boat,
+2026-06-22,en,toad,
+2026-06-22,en,float,
+2026-06-25,zh,雨天,
+2026-06-25,zh,刮风天,
+2026-06-25,zh,放风筝,
+2026-06-25,zh,水母,
+2026-06-25,zh,鲸鱼,
+2026-06-25,zh,螃蟹,
+2026-06-29,ms,daun,叶子
+2026-06-29,ms,bunga,花
+2026-06-29,ms,batang,茎
+2026-06-29,ms,akar,根
+2026-06-29,ms,tanah,泥土
+2026-06-29,ms,kebun,园地
+2026-07-06,en,sea,
+2026-07-06,en,crab,
+2026-07-06,en,sand,
+2026-07-06,en,wave,
+2026-07-06,en,towel,
+2026-07-06,en,ball,
+2026-07-09,zh,长颈鹿,
+2026-07-09,zh,章鱼,
+2026-07-09,zh,虾,
+2026-07-09,zh,顾客,
+2026-07-09,zh,沙堡,
+2026-07-09,zh,救生圈,
+2026-07-13,ms,ombak,海浪
+2026-07-13,ms,pantai,海滩
+2026-07-13,ms,pasir,沙
+2026-07-13,ms,batu,石头
+2026-07-13,ms,kelapa,椰子
+2026-07-13,ms,pulau,岛`;
 
-      { Date: '2026-03-12', Language: 'Chinese', Word: '黑裤', Hint: '衣服' },
-      { Date: '2026-03-12', Language: 'Chinese', Word: '红裙', Hint: '衣服' },
-      { Date: '2026-03-12', Language: 'Chinese', Word: '蓝鞋', Hint: '鞋子' },
-      { Date: '2026-03-12', Language: 'Chinese', Word: '绿袜', Hint: '袜子' },
-      { Date: '2026-03-12', Language: 'Chinese', Word: '白衣', Hint: '衣服' },
-      { Date: '2026-03-12', Language: 'Chinese', Word: '黄帽', Hint: '帽子' },
+    const state = loadState();
 
-      { Date: '2026-03-16', Language: 'Malay', Word: 'topi', Hint: '帽子' },
-      { Date: '2026-03-16', Language: 'Malay', Word: 'gaun', Hint: '裙子' },
-      { Date: '2026-03-16', Language: 'Malay', Word: 'blaus', Hint: '上衣' },
-      { Date: '2026-03-16', Language: 'Malay', Word: 'seluar', Hint: '裤子' },
-      { Date: '2026-03-16', Language: 'Malay', Word: 'kasut', Hint: '鞋子' },
-      { Date: '2026-03-16', Language: 'Malay', Word: 'Kemeja', Hint: '衬衫' },
+    const langMap = { zh: 'zh-CN', cn: 'zh-CN', chinese: 'zh-CN', en: 'en-US', english: 'en-US', ms: 'ms-MY', bm: 'ms-MY', malay: 'ms-MY' };
 
-      { Date: '2026-03-30', Language: 'English', Word: 'red', Hint: 'colour' },
-      { Date: '2026-03-30', Language: 'English', Word: 'blue', Hint: 'colour' },
-      { Date: '2026-03-30', Language: 'English', Word: 'yellow', Hint: 'colour' },
-      { Date: '2026-03-30', Language: 'English', Word: 'green', Hint: 'colour' },
-      { Date: '2026-03-30', Language: 'English', Word: 'white', Hint: 'colour' },
-      { Date: '2026-03-30', Language: 'English', Word: 'black', Hint: 'colour' },
+    document.getElementById('fileInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const text = await file.text();
+      document.getElementById('manualInput').value = text;
+      loadCSV(text, true);
+    });
 
-      { Date: '2026-04-06', Language: 'Malay', Word: 'ketat', Hint: '紧' },
-      { Date: '2026-04-06', Language: 'Malay', Word: 'longgar', Hint: '松' },
-      { Date: '2026-04-06', Language: 'Malay', Word: 'baharu', Hint: '新的' },
-      { Date: '2026-04-06', Language: 'Malay', Word: 'lama', Hint: '旧的' },
-      { Date: '2026-04-06', Language: 'Malay', Word: 'pakai', Hint: '穿/用' },
-      { Date: '2026-04-06', Language: 'Malay', Word: 'ini', Hint: '这个' },
-
-      { Date: '2026-04-09', Language: 'Chinese', Word: '山竹', Hint: '水果' },
-      { Date: '2026-04-09', Language: 'Chinese', Word: '西瓜', Hint: '水果' },
-      { Date: '2026-04-09', Language: 'Chinese', Word: '洋白菜', Hint: '蔬菜' },
-      { Date: '2026-04-09', Language: 'Chinese', Word: '芒果', Hint: '水果' },
-      { Date: '2026-04-09', Language: 'Chinese', Word: '番茄', Hint: '蔬果' },
-      { Date: '2026-04-09', Language: 'Chinese', Word: '香蕉', Hint: '水果' },
-
-      { Date: '2026-04-13', Language: 'English', Word: 'pail', Hint: '' },
-      { Date: '2026-04-13', Language: 'English', Word: 'mail', Hint: '' },
-      { Date: '2026-04-13', Language: 'English', Word: 'train', Hint: '' },
-      { Date: '2026-04-13', Language: 'English', Word: 'clay', Hint: '' },
-      { Date: '2026-04-13', Language: 'English', Word: 'play', Hint: '' },
-      { Date: '2026-04-13', Language: 'English', Word: 'tray', Hint: '' },
-
-      { Date: '2026-04-16', Language: 'Chinese', Word: '泥土', Hint: '自然' },
-      { Date: '2026-04-16', Language: 'Chinese', Word: '树木', Hint: '植物' },
-      { Date: '2026-04-16', Language: 'Chinese', Word: '蝴蝶', Hint: '昆虫' },
-      { Date: '2026-04-16', Language: 'Chinese', Word: '玫瑰', Hint: '花' },
-      { Date: '2026-04-16', Language: 'Chinese', Word: '青草', Hint: '植物' },
-      { Date: '2026-04-16', Language: 'Chinese', Word: '埋进', Hint: '动作' },
-
-      { Date: '2026-04-20', Language: 'Malay', Word: 'anggur', Hint: '水果' },
-      { Date: '2026-04-20', Language: 'Malay', Word: 'durian', Hint: '水果' },
-      { Date: '2026-04-20', Language: 'Malay', Word: 'epal', Hint: '水果' },
-      { Date: '2026-04-20', Language: 'Malay', Word: 'nanas', Hint: '水果' },
-      { Date: '2026-04-20', Language: 'Malay', Word: 'oren', Hint: '水果' },
-      { Date: '2026-04-20', Language: 'Malay', Word: 'betik', Hint: '水果' },
-
-      { Date: '2026-04-27', Language: 'English', Word: 'meat', Hint: 'food' },
-      { Date: '2026-04-27', Language: 'English', Word: 'fish', Hint: 'food' },
-      { Date: '2026-04-27', Language: 'English', Word: 'fruits', Hint: 'food' },
-      { Date: '2026-04-27', Language: 'English', Word: 'market', Hint: 'place' },
-      { Date: '2026-04-27', Language: 'English', Word: 'vegetables', Hint: 'food' },
-      { Date: '2026-04-27', Language: 'English', Word: 'eggs', Hint: 'food' },
-
-      { Date: '2026-04-30', Language: 'Chinese', Word: '海边', Hint: '地点' },
-      { Date: '2026-04-30', Language: 'Chinese', Word: '海浪', Hint: '海边' },
-      { Date: '2026-04-30', Language: 'Chinese', Word: '晴天', Hint: '天气' },
-      { Date: '2026-04-30', Language: 'Chinese', Word: '阴天', Hint: '天气' },
-      { Date: '2026-04-30', Language: 'Chinese', Word: '贝壳', Hint: '海边' },
-      { Date: '2026-04-30', Language: 'Chinese', Word: '泳衣', Hint: '衣服' },
-
-      { Date: '2026-05-04', Language: 'Malay', Word: 'ikan', Hint: '鱼' },
-      { Date: '2026-05-04', Language: 'Malay', Word: 'ayam', Hint: '鸡' },
-      { Date: '2026-05-04', Language: 'Malay', Word: 'daging', Hint: '肉' },
-      { Date: '2026-05-04', Language: 'Malay', Word: 'ketam', Hint: '螃蟹' },
-      { Date: '2026-05-04', Language: 'Malay', Word: 'udang', Hint: '虾' },
-      { Date: '2026-05-04', Language: 'Malay', Word: 'sotong', Hint: '鱿鱼' },
-
-      { Date: '2026-05-11', Language: 'English', Word: 'zoo', Hint: 'place' },
-      { Date: '2026-05-11', Language: 'English', Word: 'room', Hint: 'place' },
-      { Date: '2026-05-11', Language: 'English', Word: 'pool', Hint: 'place' },
-      { Date: '2026-05-11', Language: 'English', Word: 'hook', Hint: 'thing' },
-      { Date: '2026-05-11', Language: 'English', Word: 'book', Hint: 'thing' },
-      { Date: '2026-05-11', Language: 'English', Word: 'wood', Hint: 'thing' },
-
-      { Date: '2026-05-14', Language: 'Chinese', Word: '狮子', Hint: '动物' },
-      { Date: '2026-05-14', Language: 'Chinese', Word: '海马', Hint: '动物' },
-      { Date: '2026-05-14', Language: 'Chinese', Word: '大象', Hint: '动物' },
-      { Date: '2026-05-14', Language: 'Chinese', Word: '老虎', Hint: '动物' },
-      { Date: '2026-05-14', Language: 'Chinese', Word: '蛇', Hint: '动物' },
-      { Date: '2026-05-14', Language: 'Chinese', Word: '猴子', Hint: '动物' },
-
-      { Date: '2026-05-18', Language: 'Malay', Word: 'betik', Hint: '木瓜' },
-      { Date: '2026-05-18', Language: 'Malay', Word: 'pisang', Hint: '香蕉' },
-      { Date: '2026-05-18', Language: 'Malay', Word: 'pokok', Hint: '树' },
-      { Date: '2026-05-18', Language: 'Malay', Word: 'tomato', Hint: '番茄' },
-      { Date: '2026-05-18', Language: 'Malay', Word: 'ros', Hint: '玫瑰' },
-      { Date: '2026-05-18', Language: 'Malay', Word: 'kaktus', Hint: '仙人掌' },
-
-      { Date: '2026-06-08', Language: 'English', Word: 'horse', Hint: 'animal' },
-      { Date: '2026-06-08', Language: 'English', Word: 'goat', Hint: 'animal' },
-      { Date: '2026-06-08', Language: 'English', Word: 'sheep', Hint: 'animal' },
-      { Date: '2026-06-08', Language: 'English', Word: 'duck', Hint: 'animal' },
-      { Date: '2026-06-08', Language: 'English', Word: 'hen', Hint: 'animal' },
-      { Date: '2026-06-08', Language: 'English', Word: 'cow', Hint: 'animal' },
-
-      { Date: '2026-06-11', Language: 'Chinese', Word: '店员', Hint: '人物' },
-      { Date: '2026-06-11', Language: 'Chinese', Word: '电梯', Hint: '设备' },
-      { Date: '2026-06-11', Language: 'Chinese', Word: '自动扶梯', Hint: '设备' },
-      { Date: '2026-06-11', Language: 'Chinese', Word: '钱', Hint: '物品' },
-      { Date: '2026-06-11', Language: 'Chinese', Word: '手推车', Hint: '物品' },
-      { Date: '2026-06-11', Language: 'Chinese', Word: '购物中心', Hint: '地点' },
-
-      { Date: '2026-06-15', Language: 'English', Word: 'hose', Hint: 'garden' },
-      { Date: '2026-06-15', Language: 'English', Word: 'soil', Hint: 'garden' },
-      { Date: '2026-06-15', Language: 'English', Word: 'spade', Hint: 'garden' },
-      { Date: '2026-06-15', Language: 'English', Word: 'fork', Hint: 'garden' },
-      { Date: '2026-06-15', Language: 'English', Word: 'flowerpot', Hint: 'garden' },
-      { Date: '2026-06-15', Language: 'English', Word: 'garden', Hint: 'place' },
-
-      { Date: '2026-06-22', Language: 'English', Word: 'croak', Hint: '' },
-      { Date: '2026-06-22', Language: 'English', Word: 'coat', Hint: '' },
-      { Date: '2026-06-22', Language: 'English', Word: 'moat', Hint: '' },
-      { Date: '2026-06-22', Language: 'English', Word: 'boat', Hint: '' },
-      { Date: '2026-06-22', Language: 'English', Word: 'toad', Hint: '' },
-      { Date: '2026-06-22', Language: 'English', Word: 'float', Hint: '' },
-
-      { Date: '2026-06-25', Language: 'Chinese', Word: '雨天', Hint: '天气' },
-      { Date: '2026-06-25', Language: 'Chinese', Word: '刮风天', Hint: '天气' },
-      { Date: '2026-06-25', Language: 'Chinese', Word: '放风筝', Hint: '活动' },
-      { Date: '2026-06-25', Language: 'Chinese', Word: '水母', Hint: '动物' },
-      { Date: '2026-06-25', Language: 'Chinese', Word: '鲸鱼', Hint: '动物' },
-      { Date: '2026-06-25', Language: 'Chinese', Word: '螃蟹', Hint: '动物' },
-
-      { Date: '2026-06-29', Language: 'Malay', Word: 'daun', Hint: '叶子' },
-      { Date: '2026-06-29', Language: 'Malay', Word: 'bunga', Hint: '花' },
-      { Date: '2026-06-29', Language: 'Malay', Word: 'batang', Hint: '树干' },
-      { Date: '2026-06-29', Language: 'Malay', Word: 'akar', Hint: '根' },
-      { Date: '2026-06-29', Language: 'Malay', Word: 'tanah', Hint: '泥土' },
-      { Date: '2026-06-29', Language: 'Malay', Word: 'kebun', Hint: '花园' },
-
-      { Date: '2026-07-06', Language: 'English', Word: 'sea', Hint: 'beach' },
-      { Date: '2026-07-06', Language: 'English', Word: 'crab', Hint: 'beach animal' },
-      { Date: '2026-07-06', Language: 'English', Word: 'sand', Hint: 'beach' },
-      { Date: '2026-07-06', Language: 'English', Word: 'wave', Hint: 'sea' },
-      { Date: '2026-07-06', Language: 'English', Word: 'towel', Hint: 'beach item' },
-      { Date: '2026-07-06', Language: 'English', Word: 'ball', Hint: 'toy' },
-
-      { Date: '2026-07-09', Language: 'Chinese', Word: '长颈鹿', Hint: '动物' },
-      { Date: '2026-07-09', Language: 'Chinese', Word: '章鱼', Hint: '动物' },
-      { Date: '2026-07-09', Language: 'Chinese', Word: '虾', Hint: '动物' },
-      { Date: '2026-07-09', Language: 'Chinese', Word: '顾客', Hint: '人物' },
-      { Date: '2026-07-09', Language: 'Chinese', Word: '沙堡', Hint: '海边' },
-      { Date: '2026-07-09', Language: 'Chinese', Word: '救生圈', Hint: '海边用品' },
-
-      { Date: '2026-07-13', Language: 'Malay', Word: 'ombak', Hint: '海浪' },
-      { Date: '2026-07-13', Language: 'Malay', Word: 'pantai', Hint: '海边' },
-      { Date: '2026-07-13', Language: 'Malay', Word: 'pasir', Hint: '沙' },
-      { Date: '2026-07-13', Language: 'Malay', Word: 'batu', Hint: '石头' },
-      { Date: '2026-07-13', Language: 'Malay', Word: 'kelapa', Hint: '椰子' },
-      { Date: '2026-07-13', Language: 'Malay', Word: 'pulau', Hint: '岛' }
-    ];
-
-    function today() {
-      const d = new Date();
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
-      return `${yyyy}-${mm}-${dd}`;
-    }
-
-    function init() {
-      document.getElementById('datePicker').value = today();
-      allWords = loadWords();
-      if (!allWords.length) {
-        allWords = sampleWords;
-        saveWords();
-      }
-      loadByDate(false);
-      updateStars();
-    }
-
-    function loadWords() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_WORDS) || '[]'); }
-      catch { return []; }
-    }
-
-    function saveWords() {
-      localStorage.setItem(STORAGE_WORDS, JSON.stringify(allWords));
-    }
-
-    function getScores() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_SCORES) || '[]'); }
-      catch { return []; }
-    }
-
-    function saveScore(score) {
-      const scores = getScores();
-      scores.unshift(score);
-      localStorage.setItem(STORAGE_SCORES, JSON.stringify(scores.slice(0, 60)));
-    }
-
-    function getStars() {
-      return Number(localStorage.getItem(STORAGE_STARS) || 0);
-    }
-
-    function addStars(count) {
-      localStorage.setItem(STORAGE_STARS, String(getStars() + count));
-      updateStars();
-    }
-
-    function updateStars() {
-      document.getElementById('starPill').textContent = `⭐ ${getStars()} stars`;
-    }
-
-    function showPage(id) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function loadByDate(goHome = true) {
-      const selectedDate = document.getElementById('datePicker').value;
-      currentWords = allWords.filter(x => normalizeDate(x.Date) === selectedDate);
-      currentIndex = 0;
-      if (goHome) {
-        alert(currentWords.length ? `找到 ${currentWords.length} 题！` : '这一天还没有听写字。');
-      }
-    }
-
-    function normalizeDate(value) {
-      if (!value) return '';
-      const v = String(value).trim();
-      if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
-      const parts = v.split(/[\/\-]/).map(s => s.trim());
-      if (parts.length === 3) {
-        if (parts[0].length === 4) return `${parts[0]}-${parts[1].padStart(2,'0')}-${parts[2].padStart(2,'0')}`;
-        return `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
-      }
-      return v;
-    }
-
-    function ensureWords() {
-      loadByDate(false);
-      if (!currentWords.length) {
-        alert('这一天没有题目。请先选择有字表的日期，或上传 CSV。');
-        return false;
-      }
-      return true;
-    }
-
-    function startPractice() {
-      if (!ensureWords()) return;
-      mode = 'practice';
-      currentIndex = 0;
-      showPage('practicePage');
-      renderPractice();
-      setTimeout(() => speakCurrent(false), 300);
-    }
-
-    function startDictation() {
-      if (!ensureWords()) return;
-      mode = 'dictation';
-      currentIndex = 0;
-      checkResults = currentWords.map(() => null);
-      showPage('dictationPage');
-      renderDictation();
-      setTimeout(() => speakCurrent(false), 300);
-    }
-
-    function currentItem() {
-      return currentWords[currentIndex];
-    }
-
-    function languageIcon(lang) {
-      const l = String(lang || '').toLowerCase();
-      if (l.includes('chinese') || l.includes('中文') || l.includes('mandarin')) return '🧧 中文';
-      if (l.includes('malay') || l.includes('bm') || l.includes('bahasa')) return '🌿 BM';
-      return '🔤 English';
-    }
-
-    function renderPractice() {
-      const item = currentItem();
-      const pct = ((currentIndex + 1) / currentWords.length) * 100;
-      document.getElementById('practiceBar').style.width = pct + '%';
-      document.getElementById('practiceContent').innerHTML = `
-        <div class="languageTag">${languageIcon(item.Language)} · 第 ${currentIndex + 1}/${currentWords.length} 题</div>
-        <div class="word">${escapeHTML(item.Word)}</div>
-        <div class="hint">💡 ${escapeHTML(item.Hint || '没有提示')}</div>
-      `;
-    }
-
-    function renderDictation() {
-      const item = currentItem();
-      const pct = ((currentIndex + 1) / currentWords.length) * 100;
-      document.getElementById('dictationBar').style.width = pct + '%';
-      document.getElementById('dictationContent').innerHTML = `
-        <div class="languageTag">${languageIcon(item.Language)} · 第 ${currentIndex + 1}/${currentWords.length} 题</div>
-        <div class="word">🎧</div>
-        <div class="hint">听声音，然后写在纸上</div>
-      `;
-    }
-
-    function nextItem() {
-      if (!currentWords.length) return;
-      if (currentIndex < currentWords.length - 1) currentIndex++;
-      if (mode === 'practice') renderPractice();
-      else renderDictation();
-      speakCurrent(false);
-    }
-
-    function prevItem() {
-      if (!currentWords.length) return;
-      if (currentIndex > 0) currentIndex--;
-      if (mode === 'practice') renderPractice();
-      else renderDictation();
-      speakCurrent(false);
-    }
-
-    function nextDictation() {
-      if (currentIndex < currentWords.length - 1) {
-        currentIndex++;
-        renderDictation();
-        speakCurrent(false);
-      } else {
-        renderCheckList();
-        showPage('checkPage');
-      }
-    }
-
-    function speakCurrent(slow) {
-      const item = currentItem();
-      if (!item || !('speechSynthesis' in window)) {
-        alert('这个浏览器不支持语音功能。');
-        return;
-      }
-      speechSynthesis.cancel();
-      const text = item.Word;
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.rate = slow ? 0.62 : 0.9;
-      utter.pitch = 1.08;
-      const lang = String(item.Language || '').toLowerCase();
-      if (lang.includes('chinese') || lang.includes('中文') || lang.includes('mandarin')) utter.lang = 'zh-CN';
-      else if (lang.includes('malay') || lang.includes('bm') || lang.includes('bahasa')) utter.lang = 'ms-MY';
-      else utter.lang = 'en-US';
-      speechSynthesis.speak(utter);
-    }
-
-    function renderCheckList() {
-      const box = document.getElementById('checkList');
-      box.innerHTML = currentWords.map((item, idx) => `
-        <div class="row">
-          <div>
-            <b>${idx + 1}. ${escapeHTML(item.Word)}</b><br>
-            <small>${languageIcon(item.Language)} ${item.Hint ? ' · ' + escapeHTML(item.Hint) : ''}</small>
-          </div>
-          <button class="smallBtn" onclick="markResult(${idx}, true)">✅ 对</button>
-          <button class="dangerBtn" onclick="markResult(${idx}, false)">❌ 错</button>
-        </div>
-      `).join('');
-    }
-
-    function markResult(idx, value) {
-      checkResults[idx] = value;
-      renderCheckList();
-      const rows = document.querySelectorAll('#checkList .row');
-      rows.forEach((row, i) => {
-        if (checkResults[i] === true) row.style.borderColor = 'rgba(97,255,177,.8)';
-        if (checkResults[i] === false) row.style.borderColor = 'rgba(255,107,138,.8)';
-      });
-    }
-
-    function finishCheck() {
-      const unanswered = checkResults.filter(x => x === null).length;
-      if (unanswered) {
-        const ok = confirm(`还有 ${unanswered} 题没有按对/错。要继续完成吗？`);
-        if (!ok) return;
-      }
-      const total = currentWords.length;
-      const correct = checkResults.filter(Boolean).length;
-      const stars = Math.max(1, correct);
-      addStars(stars);
-
-      const date = document.getElementById('datePicker').value;
-      saveScore({ date, correct, total, stars, time: new Date().toLocaleString() });
-      document.getElementById('finalScore').textContent = `${correct}/${total}`;
-      document.getElementById('finalMessage').textContent = correct === total
-        ? `太棒了！全对！获得 ${stars} 颗星！`
-        : `完成了也很棒！获得 ${stars} 颗星，错的字再练一次。`;
-      confetti();
-      showPage('resultPage');
-    }
-
-    function renderScoreHistory() {
-      const scores = getScores();
-      const box = document.getElementById('scoreHistory');
-      if (!scores.length) {
-        box.innerHTML = '<div class="empty">还没有记录。完成一次正式听写就会出现。</div>';
-        return;
-      }
-      box.innerHTML = scores.map(s => `
-        <div class="row">
-          <div><b>${escapeHTML(s.date)}</b><br><small>${escapeHTML(s.time || '')}</small></div>
-          <div>✅ ${s.correct}/${s.total}</div>
-          <div>⭐ ${s.stars}</div>
-        </div>
-      `).join('');
-    }
-
-    function importCSV() {
-      const file = document.getElementById('csvFile').files[0];
-      if (!file) return alert('请先选择 CSV 文件。');
-      const reader = new FileReader();
-      reader.onload = e => {
-        const text = e.target.result;
-        const rows = parseCSV(text);
-        if (!rows.length) return alert('CSV 没有资料。');
-        allWords = rows;
-        saveWords();
-        loadByDate(false);
-        alert(`导入成功：${rows.length} 题`);
-        showPage('homePage');
-      };
-      reader.readAsText(file, 'UTF-8');
-    }
-
-    function importTextCSV() {
-      const text = document.getElementById('pasteBox').value.trim();
-      if (!text) return alert('请先粘贴 CSV 内容。');
-      const rows = parseCSV(text);
-      if (!rows.length) return alert('没有读到资料。');
-      allWords = rows;
-      saveWords();
-      loadByDate(false);
-      alert(`导入成功：${rows.length} 题`);
-      showPage('homePage');
-    }
-
-    function parseCSV(text) {
-      const lines = text.replace(/^\uFEFF/, '').split(/\r?\n/).filter(x => x.trim());
-      if (!lines.length) return [];
-      const header = splitCSVLine(lines[0]).map(x => x.trim());
-      const dateIdx = header.findIndex(h => h.toLowerCase() === 'date');
-      const langIdx = header.findIndex(h => h.toLowerCase() === 'language');
-      const wordIdx = header.findIndex(h => h.toLowerCase() === 'word');
-      const hintIdx = header.findIndex(h => h.toLowerCase() === 'hint');
-      if (dateIdx < 0 || langIdx < 0 || wordIdx < 0) {
-        alert('CSV 第一行必须有 Date,Language,Word，Hint 可有可无。');
-        return [];
-      }
-      return lines.slice(1).map(line => {
-        const cols = splitCSVLine(line);
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
         return {
-          Date: normalizeDate(cols[dateIdx] || ''),
-          Language: (cols[langIdx] || '').trim(),
-          Word: (cols[wordIdx] || '').trim(),
-          Hint: hintIdx >= 0 ? (cols[hintIdx] || '').trim() : ''
+          coin: saved.coin ?? 1280,
+          csv: saved.csv || defaultCSV,
+          sessions: saved.sessions || [],
+          wrongBook: saved.wrongBook || [],
+          settings: saved.settings || { autoSpeak: true, repeat: 2, childName: '小朋友' }
         };
-      }).filter(x => x.Date && x.Language && x.Word);
-    }
-
-    function splitCSVLine(line) {
-      const result = [];
-      let current = '';
-      let inQuotes = false;
-      for (let i = 0; i < line.length; i++) {
-        const ch = line[i];
-        if (ch === '"') {
-          if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
-          else inQuotes = !inQuotes;
-        } else if (ch === ',' && !inQuotes) {
-          result.push(current);
-          current = '';
-        } else {
-          current += ch;
-        }
+      } catch {
+        return { coin: 1280, csv: defaultCSV, sessions: [], wrongBook: [], settings: { autoSpeak: true, repeat: 2, childName: '小朋友' } };
       }
-      result.push(current);
-      return result;
     }
 
-    function downloadSample() {
-      const csv = `Date,Language,Word,Hint\n${today()},Chinese,苹果,水果\n${today()},Chinese,学校,每天去的地方\n${today()},English,apple,fruit\n${today()},English,happy,feeling good\n${today()},Malay,epal,buah\n${today()},Malay,sekolah,tempat belajar\n`;
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    function saveState() {
+      state.coin = Number(document.getElementById('coinCount').textContent || 0);
+      localStorage.setItem(STORE_KEY, JSON.stringify(state));
+    }
+
+    function toast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1600);
+    }
+
+    function parseCSVLine(line) {
+      const result = []; let current = ''; let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') inQuotes = !inQuotes;
+        else if (char === ',' && !inQuotes) { result.push(current.trim()); current = ''; }
+        else current += char;
+      }
+      result.push(current.trim());
+      return result.map(x => x.replace(/^"|"$/g, ''));
+    }
+
+    function loadCSV(text, notify = false) {
+      const lines = text.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+      const rows = [];
+      for (const line of lines) {
+        const cols = parseCSVLine(line);
+        if (!cols.length) continue;
+        if (['date', '日期'].includes((cols[0] || '').toLowerCase())) continue;
+        if (cols.length >= 3) rows.push({ date: cols[0], lang: (cols[1] || 'en').toLowerCase(), word: cols[2], hint: cols[3] || '' });
+      }
+      allRows = rows;
+      state.csv = text;
+      document.getElementById('manualInput').value = text;
+      const dates = getDates();
+      selectedDate = dates.includes(selectedDate) ? selectedDate : (dates[0] || '');
+      renderDates();
+      refreshCurrentRows();
+      saveState();
+      if (notify) toast(`Rina 已载入 ${rows.length} 个听写字`);
+    }
+
+    function loadYesterdayCSV() { loadCSV(defaultCSV, true); }
+    function loadManualCSV() {
+      const text = document.getElementById('manualInput').value.trim();
+      if (!text) return toast('请先贴上 CSV 内容');
+      loadCSV(text, true);
+    }
+
+    function exportCSV() {
+      const blob = new Blob([state.csv || defaultCSV], { type: 'text/csv;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url;
-      a.download = 'spelling-sample.csv';
-      a.click();
+      a.href = url; a.download = 'rina-dictation-list.csv'; a.click();
       URL.revokeObjectURL(url);
     }
 
-    function clearData() {
-      if (!confirm('确定要清除所有字表、成绩和星星吗？')) return;
-      localStorage.removeItem(STORAGE_WORDS);
-      localStorage.removeItem(STORAGE_SCORES);
-      localStorage.removeItem(STORAGE_STARS);
-      allWords = sampleWords;
-      saveWords();
-      updateStars();
-      alert('已清除，并恢复示范资料。');
-      showPage('homePage');
-    }
+    function getDates() { return [...new Set(allRows.map(x => x.date))].sort(); }
 
-    function escapeHTML(value) {
-      return String(value || '')
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
-    }
-
-    function confetti() {
-      const box = document.getElementById('confetti');
-      box.innerHTML = '';
-      const icons = ['⭐','🎤','💖','✨','🎁','🌈'];
-      for (let i = 0; i < 36; i++) {
-        const s = document.createElement('span');
-        s.textContent = icons[Math.floor(Math.random() * icons.length)];
-        s.style.left = Math.random() * 100 + 'vw';
-        s.style.animationDelay = Math.random() * .35 + 's';
-        s.style.fontSize = (18 + Math.random() * 20) + 'px';
-        box.appendChild(s);
+    function renderDates() {
+      const select = document.getElementById('dateSelect');
+      const summary = document.getElementById('todaySummary');
+      const dates = getDates();
+      if (!dates.length) {
+        select.innerHTML = '<option value="">还没有 CSV 资料</option>';
+        summary.innerHTML = '<div class="empty" style="grid-column:1/-1;">请上传 CSV 或按“载入内建 CSV”。</div>';
+        return;
       }
-      setTimeout(() => box.innerHTML = '', 2200);
+
+      select.innerHTML = dates.map(date => {
+        const d = parseDate(date);
+        const count = allRows.filter(x => x.date === date).length;
+        return `<option value="${date}">${date} ｜ ${d.week} ｜ ${count} 个字</option>`;
+      }).join('');
+      select.value = selectedDate;
+      renderTodaySummary();
     }
 
-    init();
+    function renderTodaySummary() {
+      const summary = document.getElementById('todaySummary');
+      const rows = allRows.filter(r => r.date === selectedDate);
+      const chinese = rows.filter(r => normalizeLang(r.lang) === 'zh').length;
+      const english = rows.filter(r => normalizeLang(r.lang) === 'en').length;
+      const malay = rows.filter(r => normalizeLang(r.lang) === 'ms').length;
+      summary.innerHTML = `
+        <div class="summary-chip"><b>${rows.length}</b><span>今日总字数</span></div>
+        <div class="summary-chip"><b>${chinese}</b><span>中文</span></div>
+        <div class="summary-chip"><b>${english + malay}</b><span>英文 / BM</span></div>
+      `;
+    }
+
+    function parseDate(value) {
+      const date = new Date(value + 'T00:00:00');
+      if (Number.isNaN(date.getTime())) return { month: '', day: value, week: '' };
+      const weeks = ['周日','周一','周二','周三','周四','周五','周六'];
+      return { month: `${date.getMonth() + 1}月`, day: date.getDate(), week: weeks[date.getDay()] };
+    }
+
+    function selectDate(date) { selectedDate = date; renderDates(); refreshCurrentRows(); toast(`已选择 ${date}`); }
+
+    function setLangFilter(lang) {
+      langFilter = 'all';
+      refreshCurrentRows();
+    }
+
+    function refreshCurrentRows() {
+      currentRows = allRows.filter(r => r.date === selectedDate);
+      index = 0; showAnswer = false; results = currentRows.map(() => null); renderStage();
+      renderTodaySummary();
+      document.getElementById('welcomeText').textContent = selectedDate ? `${selectedDate} 有 ${currentRows.length} 个听写字，准备开始吧！` : '选择日期，开始今天的听写学习之旅吧！';
+    }
+
+    function normalizeLang(lang) { lang = (lang || '').toLowerCase(); if (['zh','cn','chinese'].includes(lang)) return 'zh'; if (['ms','bm','malay'].includes(lang)) return 'ms'; return 'en'; }
+
+    function setNav(i) { document.querySelectorAll('.nav button').forEach((b, idx) => b.classList.toggle('active', idx === i)); }
+    function goHome() { document.getElementById('home').style.display = 'grid'; document.getElementById('stage').classList.remove('active'); setNav(0); }
+
+    function startMode(nextMode) {
+      if (!currentRows.length) return toast('这个日期/语言没有听写字');
+      mode = nextMode; index = 0; showAnswer = false; results = currentRows.map(() => null); sessionStartedAt = new Date();
+      document.getElementById('home').style.display = 'none'; document.getElementById('stage').classList.add('active');
+      document.getElementById('stageTitle').textContent = nextMode === 'practice' ? '📖 练习模式' : '🎧 正式听写';
+      setNav(nextMode === 'practice' ? 1 : 2); changePose(nextMode === 'dictation' ? 'rina-coach.jpg' : 'rina-teacher.jpg', nextMode === 'dictation' ? 'coach' : 'normal', false);
+      renderStage();
+      if (nextMode === 'dictation' && state.settings.autoSpeak) setTimeout(() => playCurrent(state.settings.repeat || 2), 350);
+    }
+
+    function renderStage() {
+      if (!document.getElementById('stage').classList.contains('active')) return;
+      if (!currentRows.length) { document.getElementById('stageContent').innerHTML = '<div class="empty">这个日期/语言没有听写字。</div>'; return; }
+      mode === 'practice' ? renderPractice() : renderDictation();
+    }
+
+    function renderPractice() {
+      const r = currentRow();
+      document.getElementById('stageContent').innerHTML = `<div class="word-card">${teacherChip()}<div class="counter">${index + 1} / ${currentRows.length}</div><div><p class="word">${escapeHTML(r.word)}</p><p class="meta">Rina 提示 ｜ ${languageName(r.lang)} ${r.hint ? '｜' + escapeHTML(r.hint) : ''}</p><div class="btn-row"><button class="blue" onclick="playCurrent(1)">🔊 播放发音</button><button onclick="prevWord()">上一题</button><button class="primary" onclick="nextWord()">下一题</button></div></div></div>${statsHTML()}`;
+    }
+
+    function renderDictation() {
+      const r = currentRow();
+      document.getElementById('stageContent').innerHTML = `<div class="word-card">${teacherChip()}<div class="counter">${index + 1} / ${currentRows.length}</div><div><p class="hidden-word">????</p><p class="meta">Rina 老师会念题目，请写在纸上。完成后再显示答案。</p>${showAnswer ? `<p class="answer-word">${escapeHTML(r.word)}</p><p class="meta">${r.hint ? escapeHTML(r.hint) : languageName(r.lang)}</p>` : ''}<div class="btn-row"><button class="blue" onclick="playCurrent(state.settings.repeat || 2)">🎧 念题 ${state.settings.repeat || 2} 次</button><button class="gold" onclick="toggleAnswer()">${showAnswer ? '隐藏答案' : '显示答案'}</button><button class="primary" onclick="markResult(true)">✅ 我写对了</button><button onclick="markResult(false)">❌ 我写错了</button></div><div class="btn-row"><button onclick="prevWord()">上一题</button><button onclick="nextWord()">下一题</button></div></div></div>${statsHTML()}<div class="result-list">${currentRows.map((row, i) => resultHTML(row, i, true)).join('')}</div>`;
+    }
+
+    function teacherChip() { return `<div class="teacher-chip"><div class="teacher-face"><img src="rina-teacher.jpg" onerror="this.remove(); this.parentElement.textContent='🎀';"></div><div><b>Teacher Rina</b><br><span class="meta" style="font-size:12px;">你的听写导师</span></div></div>`; }
+    function statsHTML() { const correct = results.filter(x => x === true).length; const wrong = results.filter(x => x === false).length; const pending = currentRows.length - correct - wrong; return `<div class="stats"><div class="stat"><b>${currentRows.length}</b><span>今日字数</span></div><div class="stat"><b>${correct}</b><span>答对</span></div><div class="stat"><b>${wrong}</b><span>答错</span></div><div class="stat"><b>${pending}</b><span>未批改</span></div></div>`; }
+    function resultHTML(r, i, canJump) { const state = results[i]; return `<div class="result-item"><div><b>${i + 1}. ${escapeHTML(r.word)}</b><br><span class="meta">${languageName(r.lang)} ${r.hint ? '｜' + escapeHTML(r.hint) : ''}</span></div><span class="pill ${state === true ? 'good' : state === false ? 'bad' : ''}">${state === true ? '对' : state === false ? '错' : '未改'}</span>${canJump ? `<button onclick="jumpTo(${i})">查看</button>` : ''}</div>`; }
+
+    function showResults() { document.getElementById('home').style.display = 'none'; document.getElementById('stage').classList.add('active'); document.getElementById('stageTitle').textContent = '🏆 今日成绩'; setNav(3); renderResultSummary(); }
+    function renderResultSummary() { document.getElementById('stageContent').innerHTML = currentRows.length ? `${statsHTML()}<div class="result-list">${currentRows.map((r, i) => resultHTML(r, i, true)).join('')}</div>` : '<div class="empty">还没有选择听写内容。</div>'; }
+
+    function showWrongBook() {
+      document.getElementById('home').style.display = 'none'; document.getElementById('stage').classList.add('active'); document.getElementById('stageTitle').textContent = '⭐ 错题本'; setNav(4);
+      const wrong = state.wrongBook;
+      document.getElementById('stageContent').innerHTML = wrong.length ? `<div class="panel" style="box-shadow:none;"><h3 class="panel-title">累计错题：${wrong.length}</h3><div class="result-list">${wrong.slice().reverse().map((r, i) => `<div class="result-item"><div><b>${escapeHTML(r.word)}</b><br><span class="meta">${r.date} ｜ ${languageName(r.lang)} ｜ 错 ${r.count} 次</span></div><button class="blue" onclick="speak('${escapeAttr(r.word)}','${getVoiceLang(r)}',1)">🔊</button><button onclick="removeWrong('${escapeAttr(r.key)}')">移除</button></div>`).join('')}</div></div>` : '<div class="empty">目前还没有错题。继续保持，Rina 老师为你加油！💖</div>';
+    }
+
+    function showParentDashboard() {
+      document.getElementById('home').style.display = 'none'; document.getElementById('stage').classList.add('active'); document.getElementById('stageTitle').textContent = '👨‍👩‍👧 家长后台'; setNav(5);
+      const totalSessions = state.sessions.length;
+      const totalCorrect = state.sessions.reduce((s, x) => s + x.correct, 0);
+      const totalWrong = state.sessions.reduce((s, x) => s + x.wrong, 0);
+      const accuracy = totalCorrect + totalWrong ? Math.round(totalCorrect / (totalCorrect + totalWrong) * 100) : 0;
+      document.getElementById('stageContent').innerHTML = `<div class="admin-grid"><div class="admin-card"><b>${totalSessions}</b><span class="meta">完成次数</span></div><div class="admin-card"><b>${accuracy}%</b><span class="meta">累计正确率</span></div><div class="admin-card"><b>${state.wrongBook.length}</b><span class="meta">错题数量</span></div></div><div class="panel" style="margin-top:16px;box-shadow:none;"><h3 class="panel-title">设置</h3><div class="setting-row"><b>孩子名字</b><input id="childName" value="${escapeHTML(state.settings.childName || '小朋友')}" style="width:100%;border-radius:999px;padding:13px 16px;border:1px solid rgba(255,255,255,.22);background:rgba(0,0,0,.2);color:white;"></div><div class="setting-row"><b>念题次数</b><select id="repeatSetting"><option value="1">1 次</option><option value="2">2 次</option><option value="3">3 次</option></select></div><div class="setting-row"><b>开始后自动念题</b><select id="autoSpeakSetting"><option value="true">开启</option><option value="false">关闭</option></select></div><div class="btn-row"><button class="primary" onclick="saveSettings()">保存设置</button><button onclick="exportRecords()">导出学习记录</button><button class="danger" onclick="resetRecords()">清空记录</button></div></div><div class="panel" style="margin-top:16px;box-shadow:none;"><h3 class="panel-title">最近学习记录</h3><div class="result-list">${state.sessions.slice().reverse().slice(0,12).map(s => `<div class="result-item"><div><b>${s.date} ｜ ${s.mode}</b><br><span class="meta">${s.createdAt} ｜ 对 ${s.correct} ｜ 错 ${s.wrong} ｜ 正确率 ${s.accuracy}%</span></div></div>`).join('') || '<div class="empty">暂无记录</div>'}</div></div>`;
+      document.getElementById('repeatSetting').value = String(state.settings.repeat || 2);
+      document.getElementById('autoSpeakSetting').value = String(state.settings.autoSpeak !== false);
+    }
+
+    function saveSettings() { state.settings.childName = document.getElementById('childName').value || '小朋友'; state.settings.repeat = Number(document.getElementById('repeatSetting').value); state.settings.autoSpeak = document.getElementById('autoSpeakSetting').value === 'true'; saveState(); toast('设置已保存'); }
+    function exportRecords() { const blob = new Blob([JSON.stringify({ sessions: state.sessions, wrongBook: state.wrongBook }, null, 2)], { type: 'application/json;charset=utf-8' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'rina-learning-records.json'; a.click(); URL.revokeObjectURL(url); }
+    function resetRecords() { if (!confirm('确定清空学习记录和错题本？')) return; state.sessions = []; state.wrongBook = []; saveState(); toast('记录已清空'); showParentDashboard(); }
+
+    function removeWrong(key) { state.wrongBook = state.wrongBook.filter(x => x.key !== key); saveState(); showWrongBook(); }
+
+    function currentRow() { return currentRows[index]; }
+    function languageName(lang) { const n = normalizeLang(lang); if (n === 'zh') return '中文'; if (n === 'ms') return 'Bahasa Melayu'; return 'English'; }
+    function getVoiceLang(row) { return langMap[(row.lang || '').toLowerCase()] || langMap[normalizeLang(row.lang)] || 'en-US'; }
+
+    function speak(text, lang, repeat = 1) {
+      if (!('speechSynthesis' in window)) return toast('这个浏览器不支持语音朗读');
+
+      speechSynthesis.cancel();
+
+      const voices = speechSynthesis.getVoices();
+      let selectedVoice = null;
+
+      if (lang.includes('zh')) {
+        selectedVoice = voices.find(v =>
+          v.lang.includes('zh') ||
+          /Ting|Sin|Mei|Chinese|Mandarin|中文/i.test(v.name)
+        );
+      } else if (lang.includes('ms')) {
+        selectedVoice = voices.find(v =>
+          v.lang.includes('ms') || /Malay/i.test(v.name)
+        );
+      } else {
+        selectedVoice = voices.find(v =>
+          v.lang.includes('en') || /English/i.test(v.name)
+        );
+      }
+
+      let count = 0;
+
+      const run = () => {
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = lang;
+        utter.rate = lang.includes('zh') ? 0.72 : 0.82;
+        utter.pitch = 1.02;
+
+        if (selectedVoice) {
+          utter.voice = selectedVoice;
+        }
+
+        utter.onend = () => {
+          count++;
+          if (count < repeat) {
+            setTimeout(run, 650);
+          }
+        };
+
+        utter.onerror = () => {
+          toast('Safari 中文语音可能未启用');
+        };
+
+        speechSynthesis.speak(utter);
+      };
+
+      run();
+    }
+
+    function playCurrent(repeat) { const r = currentRow(); speak(r.word, getVoiceLang(r), repeat); }
+    function nextWord() { index = Math.min(index + 1, currentRows.length - 1); showAnswer = false; renderStage(); if (mode === 'dictation' && state.settings.autoSpeak) setTimeout(() => playCurrent(state.settings.repeat || 2), 250); }
+    function prevWord() { index = Math.max(index - 1, 0); showAnswer = false; renderStage(); }
+    function jumpTo(i) { index = i; showAnswer = true; mode = 'dictation'; document.getElementById('stageTitle').textContent = '🎧 正式听写'; renderStage(); }
+    function toggleAnswer() { showAnswer = !showAnswer; renderStage(); }
+
+    function markResult(value) {
+      const r = currentRow();
+      results[index] = value;
+      if (value) { state.coin += 5; if ('speechSynthesis' in window) {
+      speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => {
+        speechSynthesis.getVoices();
+      };
+    }
+
+    document.getElementById('coinCount').textContent = state.coin; changePose('rina-happy.jpg', 'happy', false); }
+      else { addWrong(r); changePose('rina-coach.jpg', 'coach', false); }
+      saveState();
+      if (results.every(x => x !== null)) finishSession();
+      if (index < currentRows.length - 1) { index++; showAnswer = false; renderStage(); if (mode === 'dictation' && state.settings.autoSpeak) setTimeout(() => playCurrent(state.settings.repeat || 2), 300); }
+      else renderStage();
+    }
+
+    function addWrong(r) {
+      const key = `${r.date}|${r.lang}|${r.word}`;
+      const found = state.wrongBook.find(x => x.key === key);
+      if (found) found.count += 1;
+      else state.wrongBook.push({ key, date: r.date, lang: r.lang, word: r.word, hint: r.hint, count: 1 });
+    }
+
+    function finishSession() {
+      const correct = results.filter(x => x === true).length;
+      const wrong = results.filter(x => x === false).length;
+      const accuracy = correct + wrong ? Math.round(correct / (correct + wrong) * 100) : 0;
+      const session = { createdAt: new Date().toLocaleString(), date: selectedDate, langFilter, mode: mode === 'practice' ? '练习' : '正式听写', total: currentRows.length, correct, wrong, accuracy, startedAt: sessionStartedAt ? sessionStartedAt.toLocaleString() : '' };
+      const last = state.sessions[state.sessions.length - 1];
+      if (!last || last.createdAt !== session.createdAt) state.sessions.push(session);
+      saveState();
+      if (accuracy === 100 && wrong === 0) showCelebration(); else toast(`完成！正确率 ${accuracy}%`);
+    }
+
+    function showCelebration() { const c = document.getElementById('celebration'); c.classList.add('show'); setTimeout(() => c.classList.remove('show'), 1800); }
+
+    function shuffleCurrent() { for (let i = currentRows.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [currentRows[i], currentRows[j]] = [currentRows[j], currentRows[i]]; } index = 0; showAnswer = false; results = currentRows.map(() => null); renderStage(); toast('已随机排序'); }
+
+    function changePose(src, mood, notify = true) {
+      const img = document.getElementById('rinaImage'); const fallback = document.getElementById('rinaFallback');
+      img.classList.remove('pose-change');
+      void img.offsetWidth;
+      img.classList.add('pose-change');
+      img.style.display = 'block'; fallback.style.display = 'none'; img.src = src;
+      const speech = document.getElementById('speech');
+      speech.innerHTML = mood === 'happy' ? `Great job!<br><span style="font-size:17px;color:#f3d7ff;">你又进步了！✨</span>` : mood === 'coach' ? `Don't worry!<br><span style="font-size:17px;color:#f3d7ff;">错题是升级机会！💪</span>` : `Hi, I'm<br>Teacher Rina!<br><span style="font-size:17px;color:#f3d7ff;">Let's learn, listen and shine together! ✨</span>`;
+      if (notify) toast('已切换 Rina 立绘');
+    }
+
+    function escapeHTML(value) { return String(value).replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char])); }
+    function escapeAttr(value) { return String(value).replace(/['"\\]/g, ''); }
+
+    document.getElementById('coinCount').textContent = state.coin;
+    loadCSV(state.csv || defaultCSV, false);
+    goHome();
   </script>
 </body>
 </html>
