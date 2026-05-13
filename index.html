@@ -261,12 +261,55 @@
     .celebration .msg { font-size: clamp(42px, 8vw, 92px); font-weight: 950; text-align: center; text-shadow: 0 0 34px rgba(255,95,206,.8); }
     @keyframes fadeCelebration { 0% { opacity: 0; transform: scale(.9); } 20%,80% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.08); } }
 
-    @media (max-width: 1080px) {
-      .layout { grid-template-columns: 1fr; }
-      .rina-panel { min-height: 610px; }
-      .rina-avatar { height: 430px; }
-      .rina-image { max-height: 410px; }
-      .speech { top: 74px; }
+    @media (max-width: 1180px) and (min-width: 721px) {
+      .app { width: min(1180px, 98vw); }
+      .topbar { position: sticky; top: 8px; }
+      .layout {
+        grid-template-columns: 300px 1fr;
+        gap: 14px;
+        align-items: start;
+      }
+      .rina-panel {
+        min-height: auto;
+        height: calc(100vh - 128px);
+        position: sticky;
+        top: 112px;
+        border-radius: 28px;
+      }
+      .rina-avatar {
+        height: 310px;
+        padding: 12px;
+      }
+      .rina-image {
+        max-height: 300px;
+        width: min(100%, 230px);
+      }
+      .speech {
+        left: 14px;
+        top: 18px;
+        width: 180px;
+        padding: 14px;
+        font-size: 17px;
+      }
+      .speech span { font-size: 13px !important; }
+      .profile-card {
+        left: 14px;
+        right: 14px;
+        bottom: 14px;
+        padding: 14px;
+      }
+      .profile-card h2 { font-size: 18px; margin-bottom: 6px; }
+      .profile-card p { font-size: 13px; margin: 4px 0; }
+      .pose-row button { padding: 7px 10px; font-size: 12px; }
+      .welcome { min-height: 118px; padding: 20px 22px; }
+      .welcome h2 { font-size: 34px; }
+      .panel { padding: 18px; border-radius: 26px; }
+      .study-cards { gap: 14px; }
+      .mode-card { min-height: 170px; padding: 20px; }
+      .mode-card h3 { font-size: 26px; }
+      .mode-card p { margin-bottom: 14px; }
+      .stage { min-height: calc(100vh - 150px); }
+      .word-card { min-height: 330px; }
       .today-summary { grid-template-columns: repeat(3, 1fr); }
       .admin-grid { grid-template-columns: 1fr 1fr; }
     }
@@ -278,17 +321,38 @@
       .brand { min-width: auto; justify-content: space-between; }
       .nav { justify-content: flex-start; max-width: none; border-radius: 22px; }
       .coin { align-self: flex-end; position: absolute; top: 18px; right: 8px; }
-      .layout { gap: 12px; }
-      .rina-panel { min-height: 480px; border-radius: 28px; }
-      .rina-avatar { height: 315px; }
-      .rina-image { max-height: 310px; }
-      .speech { left: 16px; top: 58px; width: 190px; font-size: 18px; padding: 15px; }
-      .profile-card { left: 14px; right: 14px; bottom: 14px; }
+      .layout { gap: 10px; display: flex; flex-direction: column; }
+      .rina-panel {
+        min-height: 118px;
+        height: 118px;
+        border-radius: 24px;
+        order: -1;
+      }
+      .rina-glow { width: 220px; height: 220px; top: -70px; left: auto; right: -50px; }
+      .rina-avatar {
+        position: absolute;
+        right: 6px;
+        bottom: -6px;
+        height: 128px;
+        width: 112px;
+        padding: 0;
+      }
+      .rina-image { max-height: 125px; width: 105px; }
+      .speech {
+        left: 14px;
+        top: 12px;
+        width: calc(100% - 140px);
+        font-size: 16px;
+        padding: 12px 14px;
+        border-radius: 20px 20px 20px 6px;
+      }
+      .speech span { font-size: 12px !important; }
+      .profile-card { display: none; }
       .control-grid, .study-cards, .stats, .admin-grid, .setting-row { grid-template-columns: 1fr; }
       .date-picker-box { grid-template-columns: 1fr; }
       .today-summary { grid-template-columns: 1fr; }
-      .stage { min-height: calc(100vh - 160px); border-radius: 28px; padding: 16px; }
-      .word-card { min-height: calc(100vh - 330px); padding: 72px 16px 24px; }
+      .stage { min-height: calc(100vh - 155px); border-radius: 28px; padding: 16px; }
+      .word-card { min-height: calc(100vh - 290px); padding: 72px 16px 24px; }
       .stage-head { flex-direction: column; align-items: flex-start; }
       .result-item { grid-template-columns: 1fr; }
       .cat-bubble { display: none; }
